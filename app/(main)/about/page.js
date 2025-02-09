@@ -59,13 +59,13 @@ const Page = async () => {
                             <div className={"absolute inset-0 h-full w-full bg-accent"}>
                                 <img
                                     className={"h-full w-full"}
-                                    src={user.image || "/img/default-avatar.jpg"}
+                                    src={user?.image || "/img/default-avatar.jpg"}
                                     alt="about me"
                                 />
                             </div>
                         </div>
                         <div className={"mt-4"}>
-                            <div className={"text-3xl font-semibold"}>{user.name || "About me"}</div>
+                            <div className={"text-3xl font-semibold"}>{user?.name || "About me"}</div>
                         </div>
                     </div>
                     <div className={"-mx-2 mt-4"}>
