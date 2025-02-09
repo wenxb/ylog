@@ -1,0 +1,11 @@
+{
+    "tabWidth": 4,
+    "semi": false,
+    "trailingComma": "es5",
+    "bracketSpacing": false,
+    "printWidth": 120,
+    "plugins": ["prettier-plugin-tailwindcss"],
+    "tailwindStylesheet": "./styles/tailwind.css",
+    "tailwindConfig": "./tailwind.config.mjs",
+    "tailwindFunctions": ["clsx"]
+}

@@ -1,0 +1,24 @@
+.DraftEditor-root {
+  position: relative;
+
+  .public-DraftEditorPlaceholder-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    user-select: none;
+    z-index: 1;
+
+    .public-DraftEditorPlaceholder-inner {
+      color: hsl(var(--muted-foreground));
+      font-size: 19px;
+    }
+  }
+
+  .DraftEditor-editorContainer {
+    position: relative;
+    z-index: 1;
+    .public-DraftEditor-content{
+      font-size: 19px;
+    }
+  }
+}

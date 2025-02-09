@@ -1,0 +1,32 @@
+#side-toc {
+  position: relative;
+
+  .toc-list {
+    .toc-link {
+      display: flex;
+      align-items: center;
+      position: relative;
+      height: 40px;
+      padding-left: 12px;
+      padding-right: 12px;
+
+      &:hover {
+        background-color: var(--accent);
+      }
+    }
+
+    &.is-collapsible {
+      max-height: 1000px;
+      overflow: hidden;
+      transition: 0.1s;
+
+      .toc-link {
+        padding-left: 20px;
+      }
+    }
+
+    &.is-collapsed {
+      max-height: 0;
+    }
+  }
+}
