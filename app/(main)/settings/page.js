@@ -17,6 +17,11 @@ import {Separator} from "@/components/ui/separator"
 import {Switch} from "@/components/ui/switch"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Avatar, AvatarImage} from "@/components/ui/avatar"
+import {useFilePicker} from "use-file-picker"
+import matter from "gray-matter"
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog"
+import {markdownToPlate, plateToHtml} from "@/components/plate-ui/export-toolbar-button"
+import LoadingBox from "@/components/common/LoadingBox"
 
 const Title = ({children}) => {
     return <div className="text-base">{children}</div>
@@ -71,8 +76,79 @@ const Page = () => {
     const [dataForm, setDataForm] = useImmer({...initForm})
     const [oldAvatar, setOldAvatar] = useState("")
     const [tab, setTab] = useState("routine")
-
+    const [importPosts, setImportPosts] = useImmer([])
+    const [showImport, setShowImport] = useState(false)
+    const [loading, setLoading] = useState(false)
     const {toast} = useToast()
+
+    const onFilesSelected = async ({plainFiles}) => {
+        setLoading(true)
+        setShowImport(true)
+        for (const file of plainFiles) {
+            const text = await file.text()
+            const {data, content} = matter(text)
+            let item = {}
+            item["importStatus"] = "init"
+            item["title"] = data?.title || file.name.replace(/^.*[\\\/]/, "").replace(/\.[^/.]+$/, "")
+            const category = data.category || data.categories
+            const record_cate = []
+            if (Array.isArray(category) && category.length) {
+                for (const ca of category) {
+                    const c = await useAxios
+                        .get("/api/admin/category/getByName", {
+                            params: {name: ca},
+                        })
+                        .catch(() => {
+                            setLoading(false)
+                        })
+                    record_cate.push(c.data.id)
+                }
+
+                item["categories"] = record_cate
+            }
+            if (typeof category === "string") {
+                const c = await useAxios
+                    .get("/api/admin/category/getByName", {
+                        params: {name: category},
+                    })
+                    .catch(() => {
+                        setLoading(false)
+                    })
+                item["categories"] = [c.data.id]
+            }
+            if (data.image || data.cover) {
+                item["cover"] = data.cover || data.image
+            }
+            if (data.date) {
+                item["date"] = new Date(data.date).toISOString()
+            }
+            const nodes = markdownToPlate(content)
+            item["content"] = nodes
+            item["content_html"] = await plateToHtml(nodes)
+
+            const {importStatus, ...body} = item
+            await useAxios
+                .post("/api/admin/posts", {
+                    ...body,
+                    status: "publish",
+                })
+                .then(() => {
+                    item["importStatus"] = "success"
+                })
+                .catch(() => {
+                    item["importStatus"] = "error"
+                })
+
+            setImportPosts((d) => {
+                d.push({...item})
+            })
+        }
+        setLoading(false)
+    }
+    const {openFilePicker} = useFilePicker({
+        accept: ".md",
+        onFilesSelected,
+    })
 
     function getData() {
         useAxios.get("/api/admin/settings").then((res) => {
@@ -106,7 +182,7 @@ const Page = () => {
     return (
         <MainColumn>
             <PageHeader title="设置" hideBack />
-            <div className="pb-10">
+            <div className="w-full pb-10">
                 <Tabs value={tab} onValueChange={handleTabChange} defaultValue="routine" className="w-full">
                     <TabsList>
                         <TabsTrigger value="routine">常规</TabsTrigger>
@@ -456,6 +532,13 @@ const Page = () => {
                                     对应的值复制到这里
                                 </Label>
                             </MyFormItem>
+                            <Separator />
+                            <MyFormItem>
+                                <Title>Markdown</Title>
+                                <Button onClick={openFilePicker} disabled={loading} variant="outline">
+                                    导入Markdown
+                                </Button>
+                            </MyFormItem>
                         </TabsContent>
                     </div>
                 </Tabs>
@@ -466,6 +549,36 @@ const Page = () => {
                     </div>
                 </div>
             </div>
+            <Dialog open={showImport} onOpenChange={setShowImport}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>导入</DialogTitle>
+                        <DialogDescription></DialogDescription>
+                    </DialogHeader>
+                    <div>
+                        <LoadingBox loading={loading}>
+                            {importPosts.map((post, index) => (
+                                <div key={index} className="flex items-center justify-between gap-2 py-2">
+                                    <div>{post.title}</div>
+                                    <div>
+                                        {post.importStatus === "success" && (
+                                            <span className="text-green-500">导入成功</span>
+                                        )}
+                                        {post.importStatus === "error" && (
+                                            <span className="text-red-500">导入失败</span>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </LoadingBox>
+                    </div>
+                    <DialogFooter>
+                        <Button disabled={loading} onClick={() => setShowImport(false)}>
+                            确定
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </MainColumn>
     )
 }

@@ -91,6 +91,7 @@ export const viewPlugins = [
     // Block Style
     alignPlugin,
     ...indentListPlugins,
+
     lineHeightPlugin,
 ] as const
 

@@ -79,7 +79,7 @@ export const EasayMedia = pgTable("easay_medias", {
 
 export const Category = pgTable("categories", {
     id: serial().primaryKey(),
-    name: varchar(),
+    name: varchar().unique().notNull(),
 })
 
 export const Users = pgTable(
@@ -91,7 +91,7 @@ export const Users = pgTable(
         name: varchar("name"),
         email: varchar("email").notNull().unique(),
         role: rolesEnum().default("user"),
-        emailVerified: timestamp("emailVerified", {mode: "date"}),
+        emailVerified: timestamp("emailVerified", {mode: "date", withTimezone: true}),
         image: varchar("image"),
         ...timestamps,
     },
@@ -142,7 +142,7 @@ export const Sessions = pgTable("session", {
     userId: uuid("userId")
         .notNull()
         .references(() => Users.id, {onDelete: "cascade"}),
-    expires: timestamp("expires", {mode: "date"}).notNull(),
+    expires: timestamp("expires", {mode: "date", withTimezone: true}).notNull(),
 })
 
 export const VerificationTokens = pgTable(
@@ -150,7 +150,7 @@ export const VerificationTokens = pgTable(
     {
         identifier: varchar("identifier").notNull(),
         token: varchar("token").notNull(),
-        expires: timestamp("expires", {mode: "date"}).notNull(),
+        expires: timestamp("expires", {mode: "date", withTimezone: true}).notNull(),
     },
     (verificationToken) => [
         {

@@ -9,12 +9,13 @@ import {getRedisClient} from "@/lib/redis/client"
 const verBody = z.object({
     id: z.number().optional(),
     title: z.string().min(1, "标题不能为空"),
-    content: z.string(),
+    content: z.array(z.any()),
     content_html: z.string(),
-    summary: z.string(),
-    cover: z.string(),
+    summary: z.string().optional().default(""),
+    cover: z.string().optional().default(""),
     status: z.enum(["draft", "publish"]),
     categories: z.array(z.number()),
+    date: z.string().optional(),
 })
 
 export const POST = async (req) => {
@@ -35,11 +36,13 @@ export const POST = async (req) => {
         const values = {
             id: parseBody.id,
             title: parseBody.title,
-            content: parseBody.content,
+            content: JSON.stringify(parseBody.content),
             contentHtml: parseBody.content_html,
             summary: parseBody.summary,
             cover: parseBody.cover,
             status: parseBody.status,
+            ...(parseBody.date ? {created_at: new Date(parseBody.date)} : {}),
+            updated_at: new Date(),
         }
 
         await db.transaction(async (tx) => {

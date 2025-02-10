@@ -2,16 +2,22 @@
 import Link from "next/link"
 import {cn} from "@/utils"
 import {usePathname} from "next/navigation"
+import {useAppStore} from "@/stores/app"
 
-const MenuItem = ({children, icon, href, ...props}) => {
+const MenuItem = ({children, icon, href, onClick, ...props}) => {
     const pathname = usePathname()
     const isActive = pathname === href
+    const app = useAppStore()
 
     return (
         <li className="max-sm:w-full">
             <Link
+                onClick={() => {
+                    if (onClick) onClick()
+                    app.setShowMobileSide(false)
+                }}
                 className={cn(
-                    "group flex h-14 w-full items-center rounded-full px-4 transition-colors hover:bg-accent max-xl:w-14 max-sm:w-full",
+                    "group flex h-14 w-full items-center rounded-full px-4 transition-colors hover:bg-accent max-xl:w-14 max-sm:w-full"
                 )}
                 href={href}
                 {...props}

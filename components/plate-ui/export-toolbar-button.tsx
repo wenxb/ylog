@@ -84,132 +84,142 @@ import {ToolbarButton} from "./toolbar"
 
 const siteUrl = "https://platejs.org"
 
-export const plateToHtml = async (value: any) => {
-    const components = {
-        [BaseBlockquotePlugin.key]: BlockquoteElementStatic,
-        [BaseBoldPlugin.key]: withProps(SlateLeaf, {as: "strong"}),
-        [BaseCodeBlockPlugin.key]: CodeBlockElementStatic,
-        [BaseCodeLinePlugin.key]: CodeLineElementStatic,
-        [BaseCodePlugin.key]: CodeLeafStatic,
-        [BaseCodeSyntaxPlugin.key]: CodeSyntaxLeafStatic,
-        [BaseColumnItemPlugin.key]: ColumnElementStatic,
-        [BaseColumnPlugin.key]: ColumnGroupElementStatic,
-        [BaseDatePlugin.key]: DateElementStatic,
-        [BaseEquationPlugin.key]: EquationElementStatic,
-        [BaseHighlightPlugin.key]: HighlightLeafStatic,
-        [BaseHorizontalRulePlugin.key]: HrElementStatic,
-        [BaseImagePlugin.key]: ImageElementStatic,
-        [BaseInlineEquationPlugin.key]: InlineEquationElementStatic,
-        [BaseItalicPlugin.key]: withProps(SlateLeaf, {as: "em"}),
-        [BaseKbdPlugin.key]: KbdLeafStatic,
-        [BaseLinkPlugin.key]: LinkElementStatic,
-        // [BaseMediaEmbedPlugin.key]: MediaEmbedElementStatic,
-        [BaseMentionPlugin.key]: MentionElementStatic,
-        [BaseParagraphPlugin.key]: ParagraphElementStatic,
-        [BaseStrikethroughPlugin.key]: withProps(SlateLeaf, {as: "del"}),
-        [BaseSubscriptPlugin.key]: withProps(SlateLeaf, {as: "sub"}),
-        [BaseSuperscriptPlugin.key]: withProps(SlateLeaf, {as: "sup"}),
-        [BaseTableCellHeaderPlugin.key]: TableCellHeaderStaticElement,
-        [BaseTableCellPlugin.key]: TableCellElementStatic,
-        [BaseTablePlugin.key]: TableElementStatic,
-        [BaseTableRowPlugin.key]: TableRowElementStatic,
-        [BaseTocPlugin.key]: TocElementStatic,
-        [BaseTogglePlugin.key]: ToggleElementStatic,
-        [BaseUnderlinePlugin.key]: withProps(SlateLeaf, {as: "u"}),
-        [HEADING_KEYS.h1]: withProps(HeadingElementStatic, {variant: "h1"}),
-        [HEADING_KEYS.h2]: withProps(HeadingElementStatic, {variant: "h2"}),
-        [HEADING_KEYS.h3]: withProps(HeadingElementStatic, {variant: "h3"}),
-        [HEADING_KEYS.h4]: withProps(HeadingElementStatic, {variant: "h4"}),
-        [HEADING_KEYS.h5]: withProps(HeadingElementStatic, {variant: "h5"}),
-        [HEADING_KEYS.h6]: withProps(HeadingElementStatic, {variant: "h6"}),
-    }
+const components = {
+    [BaseBlockquotePlugin.key]: BlockquoteElementStatic,
+    [BaseBoldPlugin.key]: withProps(SlateLeaf, {as: "strong"}),
+    [BaseCodeBlockPlugin.key]: CodeBlockElementStatic,
+    [BaseCodeLinePlugin.key]: CodeLineElementStatic,
+    [BaseCodePlugin.key]: CodeLeafStatic,
+    [BaseCodeSyntaxPlugin.key]: CodeSyntaxLeafStatic,
+    [BaseColumnItemPlugin.key]: ColumnElementStatic,
+    [BaseColumnPlugin.key]: ColumnGroupElementStatic,
+    [BaseDatePlugin.key]: DateElementStatic,
+    [BaseEquationPlugin.key]: EquationElementStatic,
+    [BaseHighlightPlugin.key]: HighlightLeafStatic,
+    [BaseHorizontalRulePlugin.key]: HrElementStatic,
+    [BaseImagePlugin.key]: ImageElementStatic,
+    [BaseInlineEquationPlugin.key]: InlineEquationElementStatic,
+    [BaseItalicPlugin.key]: withProps(SlateLeaf, {as: "em"}),
+    [BaseKbdPlugin.key]: KbdLeafStatic,
+    [BaseLinkPlugin.key]: LinkElementStatic,
+    // [BaseMediaEmbedPlugin.key]: MediaEmbedElementStatic,
+    [BaseMentionPlugin.key]: MentionElementStatic,
+    [BaseParagraphPlugin.key]: ParagraphElementStatic,
+    [BaseStrikethroughPlugin.key]: withProps(SlateLeaf, {as: "del"}),
+    [BaseSubscriptPlugin.key]: withProps(SlateLeaf, {as: "sub"}),
+    [BaseSuperscriptPlugin.key]: withProps(SlateLeaf, {as: "sup"}),
+    [BaseTableCellHeaderPlugin.key]: TableCellHeaderStaticElement,
+    [BaseTableCellPlugin.key]: TableCellElementStatic,
+    [BaseTablePlugin.key]: TableElementStatic,
+    [BaseTableRowPlugin.key]: TableRowElementStatic,
+    [BaseTocPlugin.key]: TocElementStatic,
+    [BaseTogglePlugin.key]: ToggleElementStatic,
+    [BaseUnderlinePlugin.key]: withProps(SlateLeaf, {as: "u"}),
+    [HEADING_KEYS.h1]: withProps(HeadingElementStatic, {variant: "h1"}),
+    [HEADING_KEYS.h2]: withProps(HeadingElementStatic, {variant: "h2"}),
+    [HEADING_KEYS.h3]: withProps(HeadingElementStatic, {variant: "h3"}),
+    [HEADING_KEYS.h4]: withProps(HeadingElementStatic, {variant: "h4"}),
+    [HEADING_KEYS.h5]: withProps(HeadingElementStatic, {variant: "h5"}),
+    [HEADING_KEYS.h6]: withProps(HeadingElementStatic, {variant: "h6"}),
+}
+const plugins = [
+    BaseColumnPlugin,
+    BaseColumnItemPlugin,
+    BaseTocPlugin,
+    BaseVideoPlugin,
+    BaseAudioPlugin,
+    BaseParagraphPlugin,
+    BaseHeadingPlugin,
+    BaseMediaEmbedPlugin,
+    BaseBoldPlugin,
+    BaseCodePlugin,
+    BaseItalicPlugin,
+    BaseStrikethroughPlugin,
+    BaseSubscriptPlugin,
+    BaseSuperscriptPlugin,
+    BaseUnderlinePlugin,
+    BaseBlockquotePlugin,
+    BaseDatePlugin,
+    BaseEquationPlugin,
+    BaseInlineEquationPlugin,
+    BaseCodeBlockPlugin.configure({
+        options: {
+            prism: Prism,
+        },
+    }),
+    BaseIndentPlugin.extend({
+        inject: {
+            targetPlugins: [BaseParagraphPlugin.key, BaseBlockquotePlugin.key, BaseCodeBlockPlugin.key],
+        },
+    }),
+    BaseIndentListPlugin.extend({
+        inject: {
+            targetPlugins: [
+                BaseParagraphPlugin.key,
+                ...HEADING_LEVELS,
+                BaseBlockquotePlugin.key,
+                BaseCodeBlockPlugin.key,
+                BaseTogglePlugin.key,
+            ],
+        },
+        options: {
+            listStyleTypes: {
+                todo: {
+                    liComponent: TodoLiStatic,
+                    markerComponent: TodoMarkerStatic,
+                    type: "todo",
+                },
+            },
+        },
+    }),
+    BaseLinkPlugin,
+    BaseTableRowPlugin,
+    BaseTablePlugin,
+    BaseTableCellPlugin,
+    BaseHorizontalRulePlugin,
+    BaseFontColorPlugin,
+    BaseFontBackgroundColorPlugin,
+    BaseFontSizePlugin,
+    BaseKbdPlugin,
+    BaseAlignPlugin.extend({
+        inject: {
+            targetPlugins: [
+                BaseParagraphPlugin.key,
+                BaseMediaEmbedPlugin.key,
+                ...HEADING_LEVELS,
+                BaseImagePlugin.key,
+            ],
+        },
+    }),
+    BaseLineHeightPlugin,
+    BaseHighlightPlugin,
+    BaseFilePlugin,
+    BaseImagePlugin,
+    BaseMentionPlugin,
+    BaseCommentsPlugin,
+    BaseTogglePlugin,
+    MarkdownPlugin
+]
 
+export const plateToHtml = async (value: any) => {
     const editorStatic = createSlateEditor({
-        plugins: [
-            BaseColumnPlugin,
-            BaseColumnItemPlugin,
-            BaseTocPlugin,
-            BaseVideoPlugin,
-            BaseAudioPlugin,
-            BaseParagraphPlugin,
-            BaseHeadingPlugin,
-            BaseMediaEmbedPlugin,
-            BaseBoldPlugin,
-            BaseCodePlugin,
-            BaseItalicPlugin,
-            BaseStrikethroughPlugin,
-            BaseSubscriptPlugin,
-            BaseSuperscriptPlugin,
-            BaseUnderlinePlugin,
-            BaseBlockquotePlugin,
-            BaseDatePlugin,
-            BaseEquationPlugin,
-            BaseInlineEquationPlugin,
-            BaseCodeBlockPlugin.configure({
-                options: {
-                    prism: Prism,
-                },
-            }),
-            BaseIndentPlugin.extend({
-                inject: {
-                    targetPlugins: [BaseParagraphPlugin.key, BaseBlockquotePlugin.key, BaseCodeBlockPlugin.key],
-                },
-            }),
-            BaseIndentListPlugin.extend({
-                inject: {
-                    targetPlugins: [
-                        BaseParagraphPlugin.key,
-                        ...HEADING_LEVELS,
-                        BaseBlockquotePlugin.key,
-                        BaseCodeBlockPlugin.key,
-                        BaseTogglePlugin.key,
-                    ],
-                },
-                options: {
-                    listStyleTypes: {
-                        todo: {
-                            liComponent: TodoLiStatic,
-                            markerComponent: TodoMarkerStatic,
-                            type: "todo",
-                        },
-                    },
-                },
-            }),
-            BaseLinkPlugin,
-            BaseTableRowPlugin,
-            BaseTablePlugin,
-            BaseTableCellPlugin,
-            BaseHorizontalRulePlugin,
-            BaseFontColorPlugin,
-            BaseFontBackgroundColorPlugin,
-            BaseFontSizePlugin,
-            BaseKbdPlugin,
-            BaseAlignPlugin.extend({
-                inject: {
-                    targetPlugins: [
-                        BaseParagraphPlugin.key,
-                        BaseMediaEmbedPlugin.key,
-                        ...HEADING_LEVELS,
-                        BaseImagePlugin.key,
-                    ],
-                },
-            }),
-            BaseLineHeightPlugin,
-            BaseHighlightPlugin,
-            BaseFilePlugin,
-            BaseImagePlugin,
-            BaseMentionPlugin,
-            BaseCommentsPlugin,
-            BaseTogglePlugin,
-        ],
+        plugins: plugins,
         value: value,
     })
-
     return await serializeHtml(editorStatic, {
         components,
         editorComponent: EditorStatic,
         props: {},
     })
+}
+
+export const markdownToPlate = (text: string)=>{
+    const editorStatic = createSlateEditor({
+        plugins: plugins,
+        value: [],
+    })
+
+    return editorStatic.getApi(MarkdownPlugin).markdown.deserialize(text);
 }
 
 const prismCss = `<link rel="stylesheet" href="${siteUrl}/prism.css">`

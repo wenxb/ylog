@@ -1,9 +1,8 @@
 "use client"
 import {Button} from "@/components/ui/button"
-import {ArrowLeftIcon, MenuIcon} from "lucide-react"
+import {ArrowLeftIcon} from "lucide-react"
 import {useRouter} from "next/navigation"
 import {cn} from "@/utils"
-import {useAppStore} from "@/stores/app"
 
 const PageHeader = ({
     title,
@@ -13,10 +12,8 @@ const PageHeader = ({
     children,
     noPadding = false,
     isSticky = true,
-    showMobileMenu = true,
 }) => {
     const router = useRouter()
-    const app = useAppStore()
 
     return (
         <div
@@ -39,11 +36,6 @@ const PageHeader = ({
             )}
             {children}
             {action}
-            {showMobileMenu && (
-                <Button className="sm:hidden" onClick={() => app.setShowMobileSide(true)} variant="ghost" size="icon">
-                    <MenuIcon className="stroke-[2.5] !size-5"/>
-                </Button>
-            )}
         </div>
     )
 }

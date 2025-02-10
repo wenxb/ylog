@@ -8,8 +8,8 @@ import {Analytics} from "@/components/module/common/analytics"
 import {SessionProvider} from "next-auth/react"
 import {Suspense} from "react"
 import {getAdminUser, getSettingsByKeys} from "@/utils/server"
-import Init from "@/components/module/Init"
-import InitConfig from "@/components/module/InitConfig"
+import Init from "@/components/module/common/Init"
+import InitConfig from "@/components/module/common/InitConfig"
 
 export function generateViewport() {
     return {

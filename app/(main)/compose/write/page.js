@@ -100,13 +100,12 @@ const Page = () => {
         if (!editorRef.current) return
 
         const editor_value = editorRef.current.getValue()
-        const content = JSON.stringify(editor_value)
         const content_html = await plateToHtml(editor_value)
 
         useAxios
             .post("/api/admin/posts", {
                 ...dataForm,
-                content,
+                content: editor_value,
                 content_html,
                 categories: dataForm.categories.map((c) => c.id),
                 status,
@@ -241,7 +240,7 @@ const Page = () => {
                             </DropdownMenu>
                         </div>
                     </div>
-                    <div className="my-7 px-4">
+                    <div className="my-5 px-4">
                         <input
                             value={dataForm.title}
                             onChange={(e) =>

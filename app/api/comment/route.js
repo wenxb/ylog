@@ -3,6 +3,7 @@ import {db} from "@/lib/db"
 import {PostComments, Users} from "@/lib/db/schema"
 import {desc, eq} from "drizzle-orm"
 import {getLoginUser} from "@/lib/server/helper"
+import {getSettingsByKeys} from "@/utils/server"
 
 const verBody = z.object({
     content: z.string().min(1, "评论内容不能为空").max(200, "最大200个字符"),
@@ -11,9 +12,13 @@ const verBody = z.object({
 })
 
 export const POST = async (req) => {
+    const config = await getSettingsByKeys(["enable_comment"])
+    if (!config?.enable_comment || config?.enable_comment === "false") {
+        return Response.error()
+    }
     const body = await req.json()
     const user = await getLoginUser(req)
-    if(!user) return Response.error()
+    if (!user) return Response.error()
     const userId = user?.id
     const ver = verBody.safeParse(body)
 

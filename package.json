@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "push": "npx drizzle-kit generate && npx drizzle-kit push",
-    "migrate": "npx drizzle-kit generate && npx drizzle-kit migrate"
+    "migrate": "npx drizzle-kit generate && npx drizzle-kit migrate",
+    "pm2": "pm2 start pnpm --name ylog -- start"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.1.9",
@@ -115,6 +116,7 @@
     "drizzle-orm": "^0.39.2",
     "embla-carousel-react": "^8.5.2",
     "form-data": "^4.0.1",
+    "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
     "howler": "^2.2.4",
     "html2canvas": "^1.4.1",

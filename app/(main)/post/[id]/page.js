@@ -43,7 +43,7 @@ async function getPostFromParams(params) {
 }
 
 export async function generateMetadata({params}) {
-    const config = await getSettingsByKeys(["site_url"])
+    const config = await getSettingsByKeys(["site_url", "enable_comment"])
     const post = await getPostFromParams(params)
 
     if (!post) {
@@ -141,7 +141,7 @@ export default async function PostPage({params}) {
 
     return (
         <>
-            <MainColumn>
+            <MainColumn className="pb-10">
                 <PageHeaderWrap
                     scrollShowBarSlot={!post.cover}
                     noPadding
@@ -149,11 +149,24 @@ export default async function PostPage({params}) {
                     action={<HeaderAction postId={post.id} />}
                 >
                     {post?.cover && (
-                        <div className="h-64 w-full -mt-[54px]">
+                        <div className="h-64 w-full">
                             <img className="w-full h-full object-cover" src={post.cover} alt={post.title} />
                         </div>
                     )}
                     <div className="px-4 pb-4">
+                        {(Array.isArray(post.category) && post.category.length > 0) && (
+                            <div className="mt-3 flex gap-2">
+                                {post.category.map((category) => (
+                                    <Link
+                                        href={"/category/" + category.name}
+                                        className="no-underline"
+                                        key={category.id}
+                                    >
+                                        <Badge className="font-normal" variant="secondary">{category.name}</Badge>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                         <PageTitle>{post.title}</PageTitle>
                         <div className="flex w-full flex-col items-start text-muted-foreground">
                             <div className="flex items-center gap-3 text-sm">
@@ -177,19 +190,7 @@ export default async function PostPage({params}) {
                                     <span>{formatCount(commentCount || 0)}</span>
                                 </div>
                             </div>
-                            {(Array.isArray(post.category) && post.category.length > 0) && (
-                                <div className="mt-3 flex gap-2">
-                                    {post.category.map((category) => (
-                                        <Link
-                                            href={"/category/" + category.name}
-                                            className="no-underline"
-                                            key={category.id}
-                                        >
-                                            <Badge variant="secondary">{category.name}</Badge>
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
+
                         </div>
                     </div>
                 </PageHeaderWrap>
@@ -243,9 +244,11 @@ export default async function PostPage({params}) {
                         )}
                     </div>
                 </div>
-                <div className="relative border-t pt-4 mb-10">
-                    <PostComment id={post.id} />
-                </div>
+                {(!config.enable_comment || config?.enable_comment === "false") ? null : (
+                    <div className="relative border-t pt-4">
+                        <PostComment id={post.id} />
+                    </div>
+                )}
             </MainColumn>
             <SideRightWrap
                 stickyWrap={
