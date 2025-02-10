@@ -17,7 +17,7 @@ const MenuItem = ({children, icon, href, onClick, ...props}) => {
                     app.setShowMobileSide(false)
                 }}
                 className={cn(
-                    "group flex h-14 w-full items-center rounded-full px-4 transition-colors hover:bg-accent max-xl:w-14 max-sm:w-full"
+                    "group flex h-13.5 w-full items-center rounded-full px-4 transition-colors hover:bg-accent max-xl:w-14 max-sm:w-full"
                 )}
                 href={href}
                 {...props}

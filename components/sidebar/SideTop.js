@@ -15,7 +15,6 @@ import {useState} from "react"
 import {LogOutIcon, SettingsIcon} from "lucide-react"
 import Auth from "@/utils/Auth"
 import {LOGIN_URL} from "@/lib/constant"
-import {useAppStore} from "@/stores/app"
 
 const SideTop = () => {
     const [show, setShow] = useState(false)
@@ -23,14 +22,12 @@ const SideTop = () => {
     const router = useRouter()
     const user = session?.user
     const pathname = usePathname()
-    const app = useAppStore()
 
     const handleLogin = () => {
         if (status === "loading") return
 
         if (!user) {
             router.push(`${LOGIN_URL}?callbackUrl=` + pathname)
-            app.setShowMobileSide(false)
         } else {
             setShow(true)
         }

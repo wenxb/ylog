@@ -6,7 +6,7 @@ const PageHeader = ({title}) => {
 
     return (
         <PageHeaderWrap hideBar>
-            <div className="mb-2">
+            <div className="-mt-2">
                 <HeaderBar/>
             </div>
             <div className="text-2xl my-3 font-semibold">{title}</div>

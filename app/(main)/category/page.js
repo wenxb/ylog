@@ -1,11 +1,19 @@
 import MainColumn from "@/components/module/common/MainColumn"
 import Link from "next/link"
 import {db} from "@/lib/db"
-import {Category} from "@/lib/db/schema"
+import {Category, PostToCategory} from "@/lib/db/schema"
 import PageHeader from "@/components/module/common/PageHeader"
+import {eq} from "drizzle-orm"
 
 const Page = async () => {
-    const categories = await db.select().from(Category)
+    const categories = await db.select({
+        id: Category.id,
+        name: Category.name,
+    }).from(Category)
+
+    for (const category of categories) {
+        category.postCount = await db.$count(PostToCategory, eq(PostToCategory.categoryId, category.id))
+    }
 
     return (
         <MainColumn>
@@ -14,15 +22,16 @@ const Page = async () => {
                 hideBack
                 secondary={categories.length > 0 ? `${categories.length} 个分类` : "还没有分类"}
             ></PageHeader>
-            <div className={"flex flex-col items-center p-6"}>
-                <ul className={"flex flex-wrap gap-2 py-6"}>
+            <div className={"flex flex-col items-center"}>
+                <ul className={"py-4 w-full"}>
                     {categories.map((category) => (
-                        <li key={category.id}>
+                        <li key={category.id} className="flex w-full">
                             <Link
-                                className={"rounded-xl px-6 py-3 text-xl transition-colors hover:bg-accent"}
+                                className={"flex justify-center w-full flex-col px-4 py-2 transition-colors hover:bg-accent"}
                                 href={"/category/" + category.name}
                             >
-                                {category.name}
+                                <div className="font-bold">{category.name}</div>
+                                <div className="text-sm text-muted-foreground mt-1">{category.postCount+"篇文章"}</div>
                             </Link>
                         </li>
                     ))}

@@ -32,7 +32,7 @@ const HeaderDesc = async () => {
     }
 
     return (
-        <div className="pb-5">
+        <div>
             {type === "one_api" && text && <p className={"text-foreground/60"}>{text}</p>}
             {type === "text" && <TypicalText className={"text-foreground/60"} text={customText} />}
         </div>

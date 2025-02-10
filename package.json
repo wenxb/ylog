@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev --port 10001",
     "build": "next build",
-    "preview": "next build && next start",
     "start": "next start",
+    "preview": "next build && next start",
     "lint": "next lint",
-    "push": "npx drizzle-kit generate && npx drizzle-kit push",
+    "push": "NODE_ENV=production npx drizzle-kit generate && NODE_ENV=production npx drizzle-kit push",
+    "push:local": "NODE_ENV=development npx drizzle-kit generate && NODE_ENV=development npx drizzle-kit push",
     "migrate": "npx drizzle-kit generate && npx drizzle-kit migrate",
     "pm2": "pm2 start pnpm --name ylog -- start"
   },

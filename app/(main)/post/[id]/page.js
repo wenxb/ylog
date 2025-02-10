@@ -133,7 +133,7 @@ export default async function PostPage({params}) {
     const prevAndNext = await getPrevAndNext(post?.id)
     const commentCount = await getPostCommentNum(post?.id)
 
-    const config = await getSettingsByKeys(["site_url"])
+    const config = await getSettingsByKeys(["site_url", "enable_comment"])
     const window = new JSDOM("").window
     const purify = DOMPurify(window)
 
@@ -149,8 +149,11 @@ export default async function PostPage({params}) {
                     action={<HeaderAction postId={post.id} />}
                 >
                     {post?.cover && (
-                        <div className="h-64 w-full">
-                            <img className="w-full h-full object-cover" src={post.cover} alt={post.title} />
+                        <div className="relative w-full">
+                            <div className="pb-[52%]"></div>
+                            <div className="absolute w-full h-full left-0 top-0">
+                                <img className="w-full h-full object-cover" src={post.cover} alt={post.title} />
+                            </div>
                         </div>
                     )}
                     <div className="px-4 pb-4">

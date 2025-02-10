@@ -14,7 +14,7 @@ export const GET = async (req) => {
             .then((result) => result[0])
 
         if (!record) {
-            record = await db
+            const insert = await db
                 .insert(Category)
                 .values({
                     name: name,
@@ -26,6 +26,7 @@ export const GET = async (req) => {
                 .onConflictDoNothing({
                     target: Category.name,
                 })
+            record = insert[0]
         }
         return Response.json(record)
     } catch (e) {

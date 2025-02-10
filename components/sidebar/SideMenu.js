@@ -10,7 +10,6 @@ const SideMenu = () => {
 
     return (
         <header
-            onClick={() => app.setShowMobileSide(false)}
             className={cn(
                 "flex grow justify-end max-sm:fixed max-sm:top-0 max-sm:left-0 max-sm:z-[1200] max-sm:w-full max-sm:justify-start",
             )}

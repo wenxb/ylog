@@ -573,7 +573,12 @@ const Page = () => {
                         </LoadingBox>
                     </div>
                     <DialogFooter>
-                        <Button disabled={loading} onClick={() => setShowImport(false)}>
+                        <Button disabled={loading} onClick={() => {
+                            setShowImport(false)
+                            setImportPosts(d=>{
+                                d.length = 0
+                            })
+                        }}>
                             确定
                         </Button>
                     </DialogFooter>
