@@ -4,8 +4,10 @@ import {db} from "@/lib/db"
 import {Category, PostToCategory} from "@/lib/db/schema"
 import PageHeader from "@/components/module/common/PageHeader"
 import {eq} from "drizzle-orm"
+import {connection} from "next/server"
 
 const Page = async () => {
+    await connection()
     const categories = await db.select({
         id: Category.id,
         name: Category.name,
