@@ -49,12 +49,12 @@ export const clearSettingsCache = async () => {
     }
 }
 
-export const getAdminUser = async () => {
+export const getAdminUser = async (skipCache=false) => {
     const redis = await getRedisClient()
     let user = await redis.json.get("admin_user")
 
     try {
-        if (!user) {
+        if (!user || skipCache) {
             user = await db
                 .select()
                 .from(Users)

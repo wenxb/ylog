@@ -26,7 +26,7 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
     ],
     events: {
         createUser: async ({user}) => {
-            const adminUser = await getAdminUser()
+            const adminUser = await getAdminUser(true)
             if (!adminUser) {
                 user.role = "admin"
                 await db

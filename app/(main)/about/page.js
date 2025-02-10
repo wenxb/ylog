@@ -6,8 +6,10 @@ import {SiBilibili, SiFacebook, SiGithub, SiX} from "@icons-pack/react-simple-ic
 import {LinkIcon, MailIcon} from "lucide-react"
 import {getAdminUser, getSettingsByKeys} from "@/utils/server"
 import AboutBody from "@/content/page/about.mdx"
+import {connection} from "next/server"
 
 const Page = async () => {
+    await connection()
     const config = await getSettingsByKeys([
         "social_github",
         "social_facebook",
