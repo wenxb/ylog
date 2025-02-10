@@ -1,4 +1,7 @@
 import {defineConfig} from "drizzle-kit"
+import {config} from "dotenv"
+
+config({ path: process.env.NODE_ENV === 'development' ? '.env.local' : '.env.production' })
 
 export default defineConfig({
     dialect: "postgresql",
@@ -8,3 +11,4 @@ export default defineConfig({
         url: process.env.AUTH_DRIZZLE_URL!,
     },
 })
+console.log(process.env.NODE_ENV)
