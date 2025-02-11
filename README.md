@@ -4,6 +4,8 @@ YLOG是一个基于 Next.js 15 开发的个人博客。
 
 ## 预览
 
+    [https://www.youngwen.com](https://www.youngwen.com)
+
 ## 功能特性
 
 - 支持暗黑主题切换
