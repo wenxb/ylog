@@ -29,7 +29,7 @@ const Page = async () => {
                     {categories.map((category) => (
                         <li key={category.id} className="flex w-full">
                             <Link
-                                className={"flex justify-center w-full flex-col px-4 py-2 transition-colors hover:bg-accent"}
+                                className={"flex justify-center w-full flex-col px-4 py-3 transition-colors hover:bg-accent"}
                                 href={"/category/" + category.name}
                             >
                                 <div className="font-bold">{category.name}</div>
