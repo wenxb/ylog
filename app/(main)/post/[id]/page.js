@@ -21,9 +21,6 @@ import PostComment from "@/components/page/post/PostComment"
 import {formatCount} from "@/utils"
 import PageTitle from "@/components/module/common/PageTitle"
 
-const contentClass =
-    "prose min-h-52 max-w-full flex-grow p-4 text-base prose-blue prose-pre:text-inherit prose-zinc dark:prose-invert prose-tr:border-b-0 prose-hr:my-0"
-
 async function getPostFromParams(params) {
     let id = (await params)?.id
 
@@ -197,7 +194,7 @@ export default async function PostPage({params}) {
                         </div>
                     </div>
                 </PageHeaderWrap>
-                <article id="article-content" className={contentClass}>
+                <article id="article-content" className="prose prose-figure:my-0 min-h-52 max-w-full flex-grow p-4 text-base prose-blue prose-pre:text-inherit prose-zinc dark:prose-invert prose-tr:border-b-0 prose-hr:my-0">
                     <div dangerouslySetInnerHTML={{__html: safeHtml}}></div>
                 </article>
                 <div className={"mt-6 flex flex-col border-t p-4"}>

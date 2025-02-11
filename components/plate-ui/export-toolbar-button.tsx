@@ -81,6 +81,7 @@ import {EditorStatic} from "./editor-static"
 import {EquationElementStatic} from "./equation-element-static"
 import {InlineEquationElementStatic} from "./inline-equation-element-static"
 import {ToolbarButton} from "./toolbar"
+import DOMPurify from "dompurify"
 
 const siteUrl = "https://platejs.org"
 
@@ -201,16 +202,33 @@ const plugins = [
     MarkdownPlugin
 ]
 
+const ALLOWED_ATTR = [
+    'class', 'style', 'title', 'lang', 'tabindex', 'hidden', 'dir', 'accesskey',
+    'href', 'target', 'rel', 'type', 'hreflang', 'name', 'value', 'placeholder', 'required',
+    'checked', 'readonly', 'disabled', 'maxlength', 'autofocus', 'size', 'src', 'alt', 'width',
+    'height', 'controls', 'autoplay', 'loop', 'poster', 'preload', 'action', 'method', 'colspan',
+    'rowspan', 'scope', 'cellpadding', 'cellspacing', 'border', 'src', 'async', 'defer', 'charset',
+    'media', 'onload', 'style', 'class'
+]
+
 export const plateToHtml = async (value: any) => {
     const editorStatic = createSlateEditor({
         plugins: plugins,
         value: value,
     })
-    return await serializeHtml(editorStatic, {
+
+    let html = await serializeHtml(editorStatic, {
         components,
         editorComponent: EditorStatic,
         props: {},
     })
+
+    html = DOMPurify.sanitize(html, {
+        ALLOWED_ATTR,
+        ALLOW_DATA_ATTR: false
+    })
+
+    return html
 }
 
 export const markdownToPlate = (text: string)=>{

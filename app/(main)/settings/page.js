@@ -191,6 +191,7 @@ const Page = () => {
                         <TabsTrigger value="site">网站</TabsTrigger>
                         <TabsTrigger value="storage">外部存储</TabsTrigger>
                         <TabsTrigger value="other">其他</TabsTrigger>
+                        <TabsTrigger value="sundry">杂项</TabsTrigger>
                     </TabsList>
                     <div className="w-full p-4">
                         <TabsContent className="space-y-6" value="routine">
@@ -515,7 +516,7 @@ const Page = () => {
                                 </Label>
                             </MyFormItem>
                         </TabsContent>
-                        <TabsContent className="space-y-5" value="other">
+                        <TabsContent className="space-y-6" value="other">
                             <MyFormItem>
                                 <Title>音乐cookie</Title>
                                 <Textarea
@@ -539,6 +540,8 @@ const Page = () => {
                                     导入Markdown
                                 </Button>
                             </MyFormItem>
+                        </TabsContent>
+                        <TabsContent className="space-y-6" value="sundry">
                         </TabsContent>
                     </div>
                 </Tabs>
@@ -573,12 +576,15 @@ const Page = () => {
                         </LoadingBox>
                     </div>
                     <DialogFooter>
-                        <Button disabled={loading} onClick={() => {
-                            setShowImport(false)
-                            setImportPosts(d=>{
-                                d.length = 0
-                            })
-                        }}>
+                        <Button
+                            disabled={loading}
+                            onClick={() => {
+                                setShowImport(false)
+                                setImportPosts((d) => {
+                                    d.length = 0
+                                })
+                            }}
+                        >
                             确定
                         </Button>
                     </DialogFooter>

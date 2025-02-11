@@ -9,8 +9,10 @@ export const LinkElementStatic = ({children, className, ...props}: SlateElementP
     return (
         <SlateElement
             as="a"
-            className={cn(className, "font-medium text-primary underline decoration-primary underline-offset-4")}
+            className={cn(className, "text-primary underline decoration-primary underline-offset-4")}
             {...props}
+            // @ts-ignore
+            target="_blank"
         >
             {children}
         </SlateElement>
