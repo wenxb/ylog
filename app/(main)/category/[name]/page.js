@@ -7,11 +7,13 @@ import {Category, Posts, PostToCategory} from "@/lib/db/schema"
 import {and, count, desc, eq} from "drizzle-orm"
 import ChildHeaderAction from "@/components/page/category/ChildHeaderAction"
 import {notFound} from "next/navigation"
+import {auth} from "@/auth"
 
 const pageSize = 12
 const Page = async ({params, searchParams}) => {
     const page = parseInt((await searchParams)?.page || "1")
     const name = decodeURIComponent((await params).name)
+    const session = await auth()
 
     const record_category = await db.select({id: Category.id}).from(Category).where(eq(Category.name, name))
     if (!record_category?.length) {
@@ -26,7 +28,7 @@ const Page = async ({params, searchParams}) => {
         .from(Posts)
         .innerJoin(PostToCategory, eq(PostToCategory.postId, Posts.id))
         .innerJoin(Category, eq(Category.id, PostToCategory.categoryId))
-        .where(and(eq(Posts.status, "publish"), eq(Category.name, name)))
+        .where(and(session ? undefined : eq(Posts.status, "publish"), eq(Category.name, name)))
         .limit(pageSize)
         .offset((page - 1) * pageSize)
         .orderBy(desc(Posts.created_at))
@@ -38,7 +40,7 @@ const Page = async ({params, searchParams}) => {
         .from(Posts)
         .innerJoin(PostToCategory, eq(PostToCategory.postId, Posts.id))
         .innerJoin(Category, eq(Category.id, PostToCategory.categoryId))
-        .where(and(eq(Posts.status, "publish"), eq(Category.name, name)))
+        .where(and(session ? undefined : eq(Posts.status, "publish"), eq(Category.name, name)))
 
     for (const post of posts) {
         post.post.category = await db

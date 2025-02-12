@@ -4,7 +4,7 @@ import useAxios from "@/lib/api/useAxios"
 import CommentList from "@/components/lists/CommentList"
 import {useToast} from "@/hooks/use-toast"
 import {useImmer} from "use-immer"
-import {useCallback, useEffect, useState} from "react"
+import {useEffect, useState} from "react"
 import {useSession} from "next-auth/react"
 import {CircleUserRoundIcon, Loader2} from "lucide-react"
 import {usePathname, useRouter} from "next/navigation"
@@ -23,7 +23,6 @@ const PostComment = ({id}) => {
     const [page, setPage] = useState(1)
 
     const getData = (p, replace = false) => {
-        console.log(p)
         useAxios
             .get(`/api/comment`, {
                 params: {

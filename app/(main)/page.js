@@ -7,21 +7,23 @@ import PostList from "@/components/lists/PostList"
 import PostPagination from "@/components/module/common/PostPagination"
 import {getSettingsByKeys} from "@/utils/server"
 import PageHeader from "@/components/page/home/PageHeader"
+import {auth} from "@/auth"
 
 const pageSize = 12
 export default async function Home({searchParams}) {
     const settings = await getSettingsByKeys(["site_title"])
     const title = settings.site_title
     const page = parseInt((await searchParams)?.page || "1")
+    const session = await auth()
 
     const posts = await db
         .select()
         .from(Posts)
-        .where(eq(Posts.status, "publish"))
+        .where(session ? undefined : eq(Posts.status, "publish"))
         .limit(pageSize)
         .offset((page - 1) * pageSize)
         .orderBy(desc(Posts.created_at))
-    const count = await db.$count(Posts, eq(Posts.status, "publish"))
+    const count = await db.$count(Posts, session ? undefined : eq(Posts.status, "publish"))
 
     for (const post of posts) {
         post.category = await db

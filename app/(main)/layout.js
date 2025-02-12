@@ -6,8 +6,8 @@ const Layout = ({children}) => {
         <>
             <div className="flex min-h-dvh w-full">
                 <SideMenu />
-                <div className="flex w-[1050px] grow max-xl:w-full">{children}</div>
-                <GlobalBottomNav/>
+                <div className="z-[1] flex w-[1050px] grow max-xl:w-full">{children}</div>
+                <GlobalBottomNav />
             </div>
         </>
     )

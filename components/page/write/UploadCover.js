@@ -47,7 +47,7 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
         formData.append("file", firstFile)
         setUploading(true)
         useAxios
-            .post("/api/upload/cover", formData)
+            .post("/api/upload/image", formData)
             .then((res) => {
                 handleSubmit(res.data?.url)
             })

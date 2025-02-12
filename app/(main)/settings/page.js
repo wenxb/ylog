@@ -196,6 +196,17 @@ const Page = () => {
                     <div className="w-full p-4">
                         <TabsContent className="space-y-6" value="routine">
                             <MyFormItem>
+                                <Title>网站URL</Title>
+                                <Input
+                                    value={dataForm.site_url}
+                                    onChange={(e) =>
+                                        setDataForm((d) => {
+                                            d.site_url = e.target.value
+                                        })
+                                    }
+                                />
+                            </MyFormItem>
+                            <MyFormItem>
                                 <Title>网站标题</Title>
                                 <Input
                                     value={dataForm.site_title}
@@ -541,8 +552,7 @@ const Page = () => {
                                 </Button>
                             </MyFormItem>
                         </TabsContent>
-                        <TabsContent className="space-y-6" value="sundry">
-                        </TabsContent>
+                        <TabsContent className="space-y-6" value="sundry"></TabsContent>
                     </div>
                 </Tabs>
 

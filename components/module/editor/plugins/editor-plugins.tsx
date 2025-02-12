@@ -21,7 +21,6 @@ import {FloatingToolbarPlugin} from "@/components/module/editor/plugins/floating
 
 import {alignPlugin} from "./align-plugin"
 import {autoformatPlugin} from "./autoformat-plugin"
-import {blockMenuPlugins} from "./block-menu-plugins"
 import {cursorOverlayPlugin} from "./cursor-overlay-plugin"
 import {deletePlugins} from "./delete-plugins"
 import {dndPlugins} from "./dnd-plugins"
@@ -107,7 +106,6 @@ export const editorPlugins = [
     // Functionality
     autoformatPlugin,
     cursorOverlayPlugin,
-    ...blockMenuPlugins,
     ...dndPlugins,
     EmojiPlugin.configure({options: {data: emojiMartData as any}}),
     exitBreakPlugin,

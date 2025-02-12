@@ -20,12 +20,15 @@ import "@/components/plate-ui/code-block-element.css"
 import PostComment from "@/components/page/post/PostComment"
 import {formatCount} from "@/utils"
 import PageTitle from "@/components/module/common/PageTitle"
+import {auth} from "@/auth"
 
 async function getPostFromParams(params) {
+    const session = await auth()
     let id = (await params)?.id
 
     const post = await getPostFromCache(id)
     if (!post) return null
+    if (post.status === "draft" && !session) return null
 
     post.category = await db
         .select({
@@ -111,6 +114,7 @@ const getPostCommentNum = async (id) => {
 export default async function PostPage({params}) {
     const post = await getPostFromParams(params)
     const user = await getAdminUser()
+
     if (!post) {
         notFound()
         return null
@@ -133,6 +137,11 @@ export default async function PostPage({params}) {
     const config = await getSettingsByKeys(["site_url", "enable_comment"])
     const window = new JSDOM("").window
     const purify = DOMPurify(window)
+    purify.addHook("afterSanitizeAttributes", (node) => {
+        if (node.nodeName === "A" && !node.getAttribute("target")) {
+            node.setAttribute("target", "_blank")
+        }
+    })
 
     const safeHtml = purify.sanitize(post.contentHtml || "")
 
@@ -148,13 +157,13 @@ export default async function PostPage({params}) {
                     {post?.cover && (
                         <div className="relative w-full">
                             <div className="pb-[52%]"></div>
-                            <div className="absolute w-full h-full left-0 top-0">
-                                <img className="w-full h-full object-cover" src={post.cover} alt={post.title} />
+                            <div className="absolute top-0 left-0 h-full w-full">
+                                <img className="h-full w-full object-cover" src={post.cover} alt={post.title} />
                             </div>
                         </div>
                     )}
                     <div className="px-4 pb-4">
-                        {(Array.isArray(post.category) && post.category.length > 0) && (
+                        {Array.isArray(post.category) && post.category.length > 0 && (
                             <div className="mt-3 flex gap-2">
                                 {post.category.map((category) => (
                                     <Link
@@ -162,7 +171,9 @@ export default async function PostPage({params}) {
                                         className="no-underline"
                                         key={category.id}
                                     >
-                                        <Badge className="font-normal" variant="secondary">{category.name}</Badge>
+                                        <Badge className="font-normal" variant="secondary">
+                                            {category.name}
+                                        </Badge>
                                     </Link>
                                 ))}
                             </div>
@@ -189,12 +200,22 @@ export default async function PostPage({params}) {
                                     <MessageSquareMoreIcon className="size-4" />
                                     <span>{formatCount(commentCount || 0)}</span>
                                 </div>
+                                {post.status === "draft" && (
+                                    <Badge
+                                        className="bg-yellow-200 px-1.5 text-[11px] leading-none text-yellow-800 hover:bg-yellow-200"
+                                        variant="secondary"
+                                    >
+                                        草稿
+                                    </Badge>
+                                )}
                             </div>
-
                         </div>
                     </div>
                 </PageHeaderWrap>
-                <article id="article-content" className="prose prose-figure:my-0 min-h-52 max-w-full flex-grow p-4 text-base prose-blue prose-pre:text-inherit prose-zinc dark:prose-invert prose-tr:border-b-0 prose-hr:my-0">
+                <article
+                    id="article-content"
+                    className="prose min-h-52 max-w-full flex-grow p-4 text-base prose-blue dark:prose-invert prose-figure:my-0 prose-pre:text-inherit prose-tr:border-b-0 prose-hr:my-0"
+                >
                     <div dangerouslySetInnerHTML={{__html: safeHtml}}></div>
                 </article>
                 <div className={"mt-6 flex flex-col border-t p-4"}>
@@ -244,7 +265,7 @@ export default async function PostPage({params}) {
                         )}
                     </div>
                 </div>
-                {(!config.enable_comment || config?.enable_comment === "false") ? null : (
+                {!config.enable_comment || config?.enable_comment === "false" ? null : (
                     <div className="relative border-t pt-4">
                         <PostComment id={post.id} />
                     </div>

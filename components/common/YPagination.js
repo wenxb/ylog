@@ -20,7 +20,7 @@ const YPagination = ({page, pageSize, count}) => {
         if (p === 1) {
             url = pathname
         }
-        router.replace(url)
+        router.push(url)
     }
 
     const generatePageLinks = () => {

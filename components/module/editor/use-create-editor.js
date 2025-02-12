@@ -4,7 +4,7 @@ import {BlockquotePlugin} from "@udecode/plate-block-quote/react"
 import {CodeBlockPlugin, CodeLinePlugin, CodeSyntaxPlugin} from "@udecode/plate-code-block/react"
 import {HorizontalRulePlugin} from "@udecode/plate-horizontal-rule/react"
 import {LinkPlugin} from "@udecode/plate-link/react"
-import {ImagePlugin, MediaEmbedPlugin} from "@udecode/plate-media/react"
+import {ImagePlugin, MediaEmbedPlugin, PlaceholderPlugin} from "@udecode/plate-media/react"
 import {TogglePlugin} from "@udecode/plate-toggle/react"
 import {ColumnItemPlugin, ColumnPlugin} from "@udecode/plate-layout/react"
 import {BulletedListPlugin, ListItemPlugin, NumberedListPlugin, TodoListPlugin} from "@udecode/plate-list/react"
@@ -58,6 +58,7 @@ import {EmojiInputPlugin} from "@udecode/plate-emoji/react"
 import {EmojiInputElement} from "@/components/plate-ui/emoji-input-element"
 import {ExcalidrawPlugin} from "@udecode/plate-excalidraw/react"
 import {ExcalidrawElement} from "@/components/plate-ui/excalidraw-element"
+import {MediaPlaceholderElement} from "@/components/plate-ui/media-placeholder-element"
 
 export const viewComponents = {
     [BlockquotePlugin.key]: BlockquoteElement,
@@ -95,6 +96,7 @@ export const viewComponents = {
     [HighlightPlugin.key]: HighlightLeaf,
     [ItalicPlugin.key]: withProps(PlateLeaf, {as: "em"}),
     [KbdPlugin.key]: KbdLeaf,
+    [PlaceholderPlugin.key]: MediaPlaceholderElement,
     [StrikethroughPlugin.key]: withProps(PlateLeaf, {as: "s"}),
     [SubscriptPlugin.key]: withProps(PlateLeaf, {as: "sub"}),
     [SuperscriptPlugin.key]: withProps(PlateLeaf, {as: "sup"}),

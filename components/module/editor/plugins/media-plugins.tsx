@@ -4,6 +4,7 @@ import {CaptionPlugin} from "@udecode/plate-caption/react"
 import {ImagePlugin, MediaEmbedPlugin, PlaceholderPlugin} from "@udecode/plate-media/react"
 
 import {ImagePreview} from "@/components/plate-ui/image-preview"
+import {MediaUploadToast} from "@/components/plate-ui/media-upload-toast"
 
 export const mediaPlugins = [
     ImagePlugin.extend({
@@ -18,5 +19,6 @@ export const mediaPlugins = [
     }),
     PlaceholderPlugin.configure({
         options: {disableEmptyPlaceholder: true},
+        render: {afterEditable: MediaUploadToast},
     }),
 ] as const
