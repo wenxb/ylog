@@ -1,8 +1,7 @@
 "use client"
-import {Button} from "@/components/ui/button"
-import {CircleXIcon, XIcon} from "lucide-react"
+import {Button} from "@arco-design/web-react"
 import {ProgressActivity} from "@/components/common/icons"
-import React from "react"
+import {IconClose, IconCloseCircle} from "@arco-design/web-react/icon"
 
 const MediaList = ({data = [], onItemRemove, isSimple = false}) => {
     const handleItemRemove = (id) => {
@@ -17,12 +16,10 @@ const MediaList = ({data = [], onItemRemove, isSimple = false}) => {
                     {!!onItemRemove && (
                         <div className="absolute top-1 right-1 z-2">
                             <Button
+                                icon={<IconClose className={"text-[20px]"} />}
+                                shape={"circle"}
                                 onClick={() => handleItemRemove(item.id)}
-                                className="size-7 min-w-0 bg-black/70 text-white hover:bg-black/60"
-                                size="icon"
-                            >
-                                <XIcon />
-                            </Button>
+                            ></Button>
                         </div>
                     )}
 
@@ -42,8 +39,8 @@ const MediaList = ({data = [], onItemRemove, isSimple = false}) => {
                                 {item.status === "uploading" && <ProgressActivity className={"text-3xl"} isActive />}
                                 {item.status === "error" && (
                                     <div className="flex flex-col items-center gap-1">
-                                        <CircleXIcon className="text-2xl text-red-500" />
-                                        <div className="text-sm text-muted-foreground">上传失败</div>
+                                        <IconCloseCircle className="text-2xl text-red-500!" />
+                                        <div className="text-sm text-muted-foreground text-red-500">上传失败</div>
                                     </div>
                                 )}
                                 {item.status === "init" && (

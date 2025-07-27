@@ -2,18 +2,17 @@
 import {useImmer} from "use-immer"
 import {useEffect, useRef, useState} from "react"
 import {EditorState} from "draft-js"
-import {useToast} from "@/hooks/use-toast"
 import useAxios from "@/lib/api/useAxios"
 import {getFileExtension} from "@/utils/file"
 import {allowImageSuffix, allowVideoSuffix} from "@/lib/constant"
 import {v4 as uuidV4} from "uuid"
 import DraftEditor from "@/components/common/DraftEditor"
 import MediaList from "@/components/lists/MediaList"
-import {Button} from "@/components/ui/button"
-import {ImageIcon} from "lucide-react"
 import {Separator} from "@/components/ui/separator"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 import {convertFromHTML} from "draft-convert"
+import {Button, Message, Notification} from "@arco-design/web-react"
+import {IconImage} from "@arco-design/web-react/icon"
 
 const initForm = {
     id: null,
@@ -25,7 +24,6 @@ const UploadEasay = ({onSubmit}) => {
     const [editorState, setEditorState] = useState(EditorState.createEmpty())
     const [isUploading, setIsUploading] = useState(false)
     const mediaInputRef = useRef(null)
-    const {toast} = useToast()
     const query = useSearchParams()
     const id = query.get("id")
     const router = useRouter()
@@ -87,10 +85,9 @@ const UploadEasay = ({onSubmit}) => {
                 })
             })
             .catch(() => {
-                toast({
+                Notification.error({
                     title: "上传失败",
-                    description: file.name,
-                    variant: "destructive",
+                    content: file.name,
                 })
                 setDataForm((d) => {
                     const find = d.media.find((i) => i.fileId === item.fileId)
@@ -133,6 +130,11 @@ const UploadEasay = ({onSubmit}) => {
     }
 
     const handleSubmit = () => {
+        if (!dataForm.content && !dataForm.media.length) {
+            Message.error("内容不能为空")
+            return
+        }
+
         useAxios
             .post("/api/admin/easay", {
                 content: dataForm.content,
@@ -141,20 +143,14 @@ const UploadEasay = ({onSubmit}) => {
             .then(() => {
                 setDataForm({...initForm})
                 setEditorState(EditorState.createEmpty())
-                toast({
-                    title: dataForm.id ? "保存成功" : "发布成功",
-                    variant: "info",
-                })
+
+                Message.success(dataForm.id ? "保存成功" : "发布成功")
 
                 router.replace(pathname)
                 if (onSubmit) onSubmit()
             })
-            .catch((err) => {
-                toast({
-                    title: "发布失败",
-                    description: err,
-                    variant: "destructive",
-                })
+            .catch(() => {
+                Message.error("发布失败")
             })
     }
 
@@ -179,7 +175,7 @@ const UploadEasay = ({onSubmit}) => {
     }
 
     return (
-        <div className="border-b border-t p-4">
+        <div className="border-t border-b p-4">
             <DraftEditor
                 placeholder="今天发生了什么"
                 editorState={editorState}
@@ -194,12 +190,12 @@ const UploadEasay = ({onSubmit}) => {
             <div className="-mb-2 flex w-full items-center justify-between pt-2">
                 <div className="-ml-2">
                     <Button
+                        icon={<IconImage style={{fontSize: 20}} />}
+                        shape={"circle"}
+                        type={"text"}
                         disabled={dataForm.media.length >= 5}
                         onClick={handleSelectFile}
-                        variant="ghost"
-                        size="icon"
                     >
-                        <ImageIcon/>
                         <input
                             onChange={handleInputChange}
                             className="hidden"
@@ -211,7 +207,7 @@ const UploadEasay = ({onSubmit}) => {
                     </Button>
                 </div>
                 <div>
-                    <Button disabled={isUploading} onClick={handleSubmit}>
+                    <Button type={"primary"} disabled={isUploading} onClick={handleSubmit}>
                         {dataForm.id ? "保存" : "发布"}
                     </Button>
                 </div>

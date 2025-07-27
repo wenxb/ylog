@@ -1,13 +1,13 @@
-import MainColumn from "@/components/module/common/MainColumn"
-import PageHeaderWrap from "@/components/module/common/PageHeaderWrap"
+import MainColumn from "@/components/module/MainColumn"
+import PageHeaderWrap from "@/components/module/PageHeaderWrap"
 import PostList from "@/components/lists/PostList"
-import PostPagination from "@/components/module/common/PostPagination"
+import PostPagination from "@/components/module/PostPagination"
 import {db} from "@/lib/db"
 import {Category, Posts, PostToCategory} from "@/lib/db/schema"
 import {and, count, desc, eq} from "drizzle-orm"
-import ChildHeaderAction from "@/components/page/category/ChildHeaderAction"
 import {notFound} from "next/navigation"
 import {auth} from "@/auth"
+import HeaderAction from "@/components/page/category/HeaderAction"
 
 const pageSize = 12
 const Page = async ({params, searchParams}) => {
@@ -60,8 +60,8 @@ const Page = async ({params, searchParams}) => {
         <MainColumn>
             <PageHeaderWrap
                 title={name}
-                footer={<ChildHeaderAction name={name} />}
                 secondary={`${countNum} 篇文章`}
+                action={<HeaderAction categoryName={name} />}
             ></PageHeaderWrap>
             <div>
                 <PostList data={data}></PostList>

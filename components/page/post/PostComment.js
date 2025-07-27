@@ -10,7 +10,7 @@ import {CircleUserRoundIcon, Loader2} from "lucide-react"
 import {usePathname, useRouter} from "next/navigation"
 import {LOGIN_URL} from "@/lib/constant"
 import {buildCommentTree} from "@/utils"
-import {Button} from "@/components/ui/button"
+import {Button} from "@arco-design/web-react"
 
 const PostComment = ({id}) => {
     const {toast} = useToast()
@@ -90,10 +90,10 @@ const PostComment = ({id}) => {
             ) : (
                 <div
                     onClick={() => router.push(`${LOGIN_URL}?callbackUrl=` + pathname)}
-                    className="flex min-h-[150px] flex-col items-center justify-center gap-3 border-b"
+                    className="flex min-h-[150px] cursor-pointer flex-col items-center justify-center gap-4 border-b"
                 >
                     <CircleUserRoundIcon className="text-muted-foreground" />
-                    <div className="text-sm select-none">登录以开始回复</div>
+                    <div className="text-sm text-muted-foreground select-none">登录以开始评论</div>
                 </div>
             )}
             <CommentList

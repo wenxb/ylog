@@ -25,18 +25,16 @@ export const POST = async (req) => {
                 id: parseBody.id,
                 content: parseBody.content,
             })
-            .returning({
-                id: Easay.id,
-            })
-            .onConflictDoUpdate({
-                target: Easay.id,
+            .onDuplicateKeyUpdate({
                 set: {
                     content: parseBody.content,
                 },
             })
+            .$returningId()
+            .then((res) => res[0])
 
         return Response.json({
-            id: record[0].id,
+            id: record.id,
         })
     } catch (err) {
         console.log(err)

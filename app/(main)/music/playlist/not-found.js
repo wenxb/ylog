@@ -1,5 +1,5 @@
 import Link from "next/link"
-import MainColumn from "@/components/module/common/MainColumn"
+import MainColumn from "@/components/module/MainColumn"
 
 export default function NotFound() {
     return (

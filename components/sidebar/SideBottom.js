@@ -3,7 +3,7 @@ import {Button} from "@/components/ui/button"
 import {MusicIcon, SquarePenIcon} from "lucide-react"
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip"
 import Link from "next/link"
-import {ModeToggle} from "@/components/module/common/ModeToggle"
+import {ModeToggle} from "@/components/module/ModeToggle"
 import Auth from "@/utils/Auth"
 import {useAppStore} from "@/stores/app"
 

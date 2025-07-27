@@ -1,4 +1,4 @@
-import MainColumn from "@/components/module/common/MainColumn"
+import MainColumn from "@/components/module/MainColumn"
 import {Button} from "@/components/ui/button"
 import Link from "next/link"
 import {ShellIcon} from "lucide-react"

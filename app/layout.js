@@ -4,12 +4,14 @@ import {ThemeProvider} from "@/lib/theme-provider"
 import {TooltipProvider} from "@/components/ui/tooltip"
 import {Toaster} from "@/components/ui/toaster"
 import {SWRProvider} from "@/lib/swr-provider"
-import {Analytics} from "@/components/module/common/analytics"
 import {SessionProvider} from "next-auth/react"
 import {Suspense} from "react"
 import {getAdminUser, getSettingsByKeys} from "@/utils/server"
-import Init from "@/components/module/common/Init"
-import InitConfig from "@/components/module/common/InitConfig"
+import Init from "@/components/module/Init"
+import InitConfig from "@/components/module/InitConfig"
+import "@/styles/arco.css"
+import "@/lib/client-entry"
+import ClientEntry from "@/lib/client-entry"
 
 export function generateViewport() {
     return {
@@ -58,23 +60,22 @@ export default async function RootLayout({children, modal}) {
         <html lang="zh" suppressHydrationWarning>
             <body>
                 <SessionProvider>
-                    <SWRProvider>
-                        <ThemeProvider
-                            attribute="class"
-                            defaultTheme={settings.default_theme || "system"}
-                            enableSystem
-                            disableTransitionOnChange
-                        >
-                            <TooltipProvider>
-                                {children}
-                            </TooltipProvider>
-                            <Toaster />
-                            <Init />
-                            <InitConfig />
-                        </ThemeProvider>
-                    </SWRProvider>
+                    <ClientEntry>
+                        <SWRProvider>
+                            <ThemeProvider
+                                attribute="class"
+                                defaultTheme={settings.default_theme || "system"}
+                                enableSystem
+                                disableTransitionOnChange
+                            >
+                                <TooltipProvider>{children}</TooltipProvider>
+                                <Toaster />
+                                <Init />
+                                <InitConfig />
+                            </ThemeProvider>
+                        </SWRProvider>
+                    </ClientEntry>
                 </SessionProvider>
-                <Analytics />
                 <Suspense fallback={null}>{modal}</Suspense>
             </body>
         </html>

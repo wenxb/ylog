@@ -1,4 +1,4 @@
-import PageLoadingBlock from "@/components/module/common/PageLoadingBlock"
+import PageLoadingBlock from "@/components/module/PageLoadingBlock"
 
 const Loading = () => {
     return <PageLoadingBlock />

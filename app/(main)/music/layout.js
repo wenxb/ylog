@@ -6,7 +6,7 @@ export const metadata = {
 }
 const Layout = ({children}) => {
     return (
-        <div className={"flex"}>
+        <div className={"flex max-xl:w-full"}>
             <div className={"flex-1"}>{children}</div>
             <SideRightWrap stickyWrap={<SideLyric />}></SideRightWrap>
         </div>

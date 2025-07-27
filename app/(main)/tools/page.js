@@ -1,11 +1,9 @@
-import MainColumn from "@/components/module/common/MainColumn"
-import PageHeaderWrap from "@/components/module/common/PageHeaderWrap"
+import MainColumn from "@/components/module/MainColumn"
 import {Avatar, AvatarImage} from "@/components/ui/avatar"
 import Link from "next/link"
 import {notFound} from "next/navigation"
 import {getSettingsByKeys} from "@/utils/server"
-import tools from "@/content/data/tools.yml"
-import PageHeader from "@/components/module/common/PageHeader"
+import PageHeader from "@/components/module/PageHeader"
 
 const ToolItem = ({tool, parentPath}) => {
     return (
@@ -38,19 +36,19 @@ const Page = async () => {
         <MainColumn>
             <PageHeader hideBack title="工具"></PageHeader>
 
-            <div className={"px-4"}>
-                {tools.data &&
-                    tools.data.map((group) => (
-                        <div key={group.key}>
-                            <div className={"mb-4 mt-2 text-xl font-semibold"}>{group.title}</div>
-                            <ul className={"-mx-2 mb-4 grid grid-cols-2 gap-4"}>
-                                {group.tools.map((tool) => (
-                                    <ToolItem parentPath={group.key} key={tool.path} tool={tool} />
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
-            </div>
+            {/*<div className={"px-4"}>*/}
+            {/*    {tools.data &&*/}
+            {/*        tools.data.map((group) => (*/}
+            {/*            <div key={group.key}>*/}
+            {/*                <div className={"mb-4 mt-2 text-xl font-semibold"}>{group.title}</div>*/}
+            {/*                <ul className={"-mx-2 mb-4 grid grid-cols-2 gap-4"}>*/}
+            {/*                    {group.tools.map((tool) => (*/}
+            {/*                        <ToolItem parentPath={group.key} key={tool.path} tool={tool} />*/}
+            {/*                    ))}*/}
+            {/*                </ul>*/}
+            {/*            </div>*/}
+            {/*        ))}*/}
+            {/*</div>*/}
         </MainColumn>
     )
 }

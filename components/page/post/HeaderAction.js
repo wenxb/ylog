@@ -1,15 +1,12 @@
 "use client"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
-import {Button} from "@/components/ui/button"
-import {CopyIcon, EllipsisVerticalIcon, PenLineIcon, Trash2Icon} from "lucide-react"
 import {useRouter} from "next/navigation"
 import useAxios from "@/lib/api/useAxios"
 import Auth from "@/utils/Auth"
-import {useToast} from "@/hooks/use-toast"
+import {Button, Dropdown, Menu, Message} from "@arco-design/web-react"
+import {IconCopy, IconDelete, IconEdit, IconMoreVertical} from "@arco-design/web-react/icon"
 
 const HeaderAction = ({postId}) => {
     const router = useRouter()
-    const {toast} = useToast()
 
     const handleRemove = () => {
         if (!postId) return
@@ -26,51 +23,48 @@ const HeaderAction = ({postId}) => {
 
     const handleCopyLink = () => {
         const link = `${window.location.origin}/post/${postId}`
-        if(!navigator.clipboard) return
+        if (!navigator.clipboard) return
         navigator.clipboard
             .writeText(link)
             .then(() => {
-                toast({
-                    title: "已复制到剪切板",
-                    variant: "info",
-                })
+                Message.success("已复制到剪切板")
             })
             .catch((err) => {
-                toast({
-                    title: "复制失败！",
-                })
+                Message.error("复制失败!")
                 console.error("复制失败！", err)
             })
     }
 
+    const isAdmin = Auth.isAdmin()
+
     return (
         <>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <EllipsisVerticalIcon />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-36">
-                        <DropdownMenuItem onClick={handleCopyLink}>
-                            <CopyIcon />
+            <Dropdown
+                trigger={"click"}
+                position={"br"}
+                droplist={
+                    <Menu className="w-36">
+                        <Menu.Item onClick={handleCopyLink} key="copyLink">
+                            <IconCopy className={"mr-3"} />
                             复制链接
-                        </DropdownMenuItem>
-                        {Auth.isAdmin() && (
-                            <>
-                                <DropdownMenuItem onClick={() => router.push("/compose/write?postId=" + postId)}>
-                                    <PenLineIcon />
-                                    编辑
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleRemove} className="text-red-500 hover:text-red-500!">
-                                    <Trash2Icon />
-                                    删除
-                                </DropdownMenuItem>
-                            </>
+                        </Menu.Item>
+                        {isAdmin && (
+                            <Menu.Item key={"edit"} onClick={() => router.push("/compose/write?postId=" + postId)}>
+                                <IconEdit className={"mr-3"} />
+                                编辑
+                            </Menu.Item>
                         )}
-
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        {isAdmin && (
+                            <Menu.Item key={"delete"} onClick={handleRemove} className="text-red-500!">
+                                <IconDelete className={"mr-3"} />
+                                删除
+                            </Menu.Item>
+                        )}
+                    </Menu>
+                }
+            >
+                <Button shape={"circle"} type={"text"} icon={<IconMoreVertical />}></Button>
+            </Dropdown>
         </>
     )
 }

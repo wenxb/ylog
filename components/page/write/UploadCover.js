@@ -1,16 +1,5 @@
 "use client"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import {Button} from "@/components/ui/button"
 import {CameraIcon, CloudUploadIcon, Trash2Icon} from "lucide-react"
-import {Label} from "@/components/ui/label"
 import {Input} from "@/components/ui/input"
 import {useEffect, useRef, useState} from "react"
 import {getFileExtension} from "@/utils/file"
@@ -18,8 +7,8 @@ import {allowImageSuffix} from "@/lib/constant"
 import useAxios from "@/lib/api/useAxios"
 import LoadingBox from "@/components/common/LoadingBox"
 import isUrl from "is-url"
-import {useToast} from "@/hooks/use-toast"
 import {cn} from "@/utils"
+import {Button, Message, Modal, Typography} from "@arco-design/web-react"
 
 const UploadCover = ({onSuccess, url, onRemove}) => {
     const [show, setShow] = useState(false)
@@ -28,7 +17,6 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
     const inputUrlRef = useRef(null)
     const [uploading, setUploading] = useState(false)
     const [imageUrl, setImageUrl] = useState("")
-    const {toast} = useToast()
 
     const handleInputChange = (e) => {
         if (dialogRef.current && dialogRef.current?.contains(e.target)) {
@@ -52,10 +40,7 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
                 handleSubmit(res.data?.url)
             })
             .catch((err) => {
-                toast({
-                    title: err,
-                    variant: "destructive",
-                })
+                Message.error(err)
             })
             .finally(() => {
                 setUploading(false)
@@ -83,10 +68,7 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
 
     const handleParseUrl = () => {
         if (!imageUrl || (imageUrl && !isUrl(imageUrl))) {
-            toast({
-                title: "链接不合法",
-                variant: "destructive",
-            })
+            Message.error("链接不合法")
             return
         }
         setUploading(true)
@@ -97,10 +79,7 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
                 setImageUrl("")
             })
             .catch((err) => {
-                toast({
-                    title: err,
-                    variant: "destructive",
-                })
+                Message.error(err)
             })
             .finally(() => {
                 setUploading(false)
@@ -119,33 +98,24 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
                     <img className="h-full w-full max-w-full object-cover" src={url} alt="" />
                 </div>
             )}
-            <Dialog open={show} onOpenChange={setShow}>
-                <DialogTrigger asChild>
-                    <div className={cn("relative z-2 flex gap-2", url && "absolute right-0 bottom-0 m-3")}>
-                        <Button size="icon" variant="secondary" className="bg-black/50 text-white hover:bg-black/30">
-                            <CameraIcon />
-                        </Button>
-                        {url && (
-                            <Button
-                                onClick={handleRemoveImg}
-                                size="icon"
-                                variant="secondary"
-                                className="bg-black/50 text-white hover:bg-black/30"
-                            >
-                                <Trash2Icon />
-                            </Button>
-                        )}
-                    </div>
-                </DialogTrigger>
-                <DialogContent className="max-w-md" ref={dialogRef}>
+            <div className={cn("relative z-2 flex gap-2", url && "absolute right-0 bottom-0 m-3")}>
+                <Button
+                    icon={<CameraIcon />}
+                    onClick={() => setShow(true)}
+                    type="secondary"
+                    size="large"
+                    className={"flex! items-center justify-center rounded-full!"}
+                />
+
+                {url && <Button icon={<Trash2Icon />} onClick={handleRemoveImg} type="secondary" />}
+            </div>
+
+            <Modal title={"上传封面"} visible={show} onCancel={() => setShow(false)}>
+                <div ref={dialogRef}>
                     <LoadingBox noBg={false} loading={uploading} childClass="gap-4">
-                        <DialogHeader>
-                            <DialogTitle>上传封面</DialogTitle>
-                            <DialogDescription></DialogDescription>
-                        </DialogHeader>
                         <div className="flex flex-col gap-5">
                             <div className="grid w-full items-center gap-1.5">
-                                <Label>本地图片</Label>
+                                <Typography.Text type="secondary">本地图片：</Typography.Text>
                                 <div
                                     onClick={() => inputRef.current?.click()}
                                     onDrop={handleInputChange}
@@ -170,7 +140,7 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
                                 </div>
                             </div>
                             <div className="grid w-full items-center gap-1.5">
-                                <Label>通过URL</Label>
+                                <Typography.Text type="secondary">通过URL：</Typography.Text>
                                 <div className="flex items-center gap-2">
                                     <Input
                                         ref={inputUrlRef}
@@ -179,21 +149,15 @@ const UploadCover = ({onSuccess, url, onRemove}) => {
                                         type="text"
                                         placeholder="https://xxx/xx.jpg"
                                     />
-                                    <Button onClick={handleParseUrl} variant="outline">
+                                    <Button onClick={handleParseUrl} type="outline">
                                         解析
                                     </Button>
                                 </div>
                             </div>
                         </div>
-                        <DialogFooter className="mt-3">
-                            <Button onClick={() => setShow(false)} variant="ghost">
-                                取消
-                            </Button>
-                            <Button>保存</Button>
-                        </DialogFooter>
                     </LoadingBox>
-                </DialogContent>
-            </Dialog>
+                </div>
+            </Modal>
         </div>
     )
 }

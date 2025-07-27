@@ -1,11 +1,11 @@
-import MainColumn from "@/components/module/common/MainColumn"
+import MainColumn from "@/components/module/MainColumn"
 import EasayList from "@/components/lists/EasayList"
 import YPagination from "@/components/common/YPagination"
 import {db} from "@/lib/db"
 import {Easay, EasayMedia} from "@/lib/db/schema"
 import {desc, eq} from "drizzle-orm"
 import EasayPageHeader from "@/components/page/easay/PageHeader"
-import PageHeader from "@/components/module/common/PageHeader"
+import PageHeader from "@/components/module/PageHeader"
 
 export const metadata = {
     title: "随记",

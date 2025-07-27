@@ -2,7 +2,7 @@ import {db} from "@/lib/db"
 import {Settings, Users} from "@/lib/db/schema"
 import {eq, not} from "drizzle-orm"
 import {z} from "zod"
-import {clearSettingsCache, getAdminUser} from "@/utils/server"
+import {getAdminUser} from "@/utils/server"
 
 export const GET = async () => {
     const user = await getAdminUser()
@@ -84,8 +84,6 @@ export const POST = async (req) => {
                 })
                 .where(eq(Settings.key, key))
         }
-
-        await clearSettingsCache()
     } catch (err) {
         console.error(err)
         return Response.error()

@@ -1,8 +1,8 @@
 "use client"
 import Link from "next/link"
 import dayjs from "@/utils/dayjs"
-import EmptyContent from "@/components/module/common/EmptyContent"
-import {Badge} from "@/components/ui/badge"
+import EmptyContent from "@/components/module/EmptyContent"
+import {Tag} from "@arco-design/web-react"
 
 const PostItem = ({post}) => {
     return (
@@ -13,27 +13,22 @@ const PostItem = ({post}) => {
                     <div className="flex items-center gap-2">
                         <h2 className={"text-xl"}>{post.title}</h2>
                         {post.status === "draft" && (
-                            <Badge
-                                className="bg-yellow-200 px-1 py-[1px] text-[11px] leading-none text-yellow-800 hover:bg-yellow-200"
-                                variant="secondary"
-                            >
+                            <Tag size="small" color="#ffb400">
                                 草稿
-                            </Badge>
+                            </Tag>
                         )}
                     </div>
                     {post.summary && <p className={"mt-2 line-clamp-2 text-sm text-foreground/60"}>{post.summary}</p>}
                     <div className={"mt-3 flex items-center text-sm text-muted-foreground"}>
                         <time>{dayjs(post.created_at).fromNow()}</time>
-                        {post.category &&
-                            post.category.map((category) => (
-                                <Link
-                                    href={"/category/" + category.name}
-                                    className={"z-5 ml-2 hover:text-blue-500"}
-                                    key={category.id}
-                                >
-                                    {category.name}
-                                </Link>
-                            ))}
+                        <div className={"z-5 ml-3 space-x-2"}>
+                            {post.category &&
+                                post.category.map((category) => (
+                                    <Link href={"/category/" + category.name} key={category.id}>
+                                        <Tag className={"hover:bg-primary! hover:text-white!"}>#{category.name}</Tag>
+                                    </Link>
+                                ))}
+                        </div>
                     </div>
                 </div>
                 {post.cover && (
@@ -50,7 +45,15 @@ const PostItem = ({post}) => {
 }
 
 const PostList = ({data = []}) => {
-    return <ul>{data.length ? data.map((post) => <PostItem key={post.id} post={post} />) : <EmptyContent />}</ul>
+    return (
+        <ul>
+            {data.length ? (
+                data.map((post) => <PostItem key={post.id} post={post} />)
+            ) : (
+                <EmptyContent text={"文章还在赶来的路上，稍安勿躁～"} />
+            )}
+        </ul>
+    )
 }
 
 export default PostList

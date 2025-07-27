@@ -1,5 +1,5 @@
-import MainColumn from "@/components/module/common/MainColumn"
-import PageHeaderWrap from "@/components/module/common/PageHeaderWrap"
+import MainColumn from "@/components/module/MainColumn"
+import PageHeaderWrap from "@/components/module/PageHeaderWrap"
 import {Button} from "@/components/ui/button"
 import Link from "next/link"
 import {SiBilibili, SiFacebook, SiGithub, SiX} from "@icons-pack/react-simple-icons"
@@ -75,7 +75,7 @@ const Page = async () => {
                     </div>
                 </div>
             </PageHeaderWrap>
-            <article className={"p-4"}>
+            <article className={"prose p-4"}>
                 <AboutBody />
             </article>
         </MainColumn>

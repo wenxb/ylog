@@ -1,6 +1,6 @@
 "use client"
 import PlayList, {PlayListItem} from "@/components/lists/PlayList"
-import SectionTitle from "@/components/module/common/SectionTitle"
+import SectionTitle from "@/components/module/SectionTitle"
 import useSWR from "swr"
 import {useRouter} from "next/navigation"
 import LoadingBox from "@/components/common/LoadingBox"

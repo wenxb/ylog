@@ -1,27 +1,19 @@
 "use client"
-import MainColumn from "@/components/module/common/MainColumn"
+import MainColumn from "@/components/module/MainColumn"
 import {useImmer} from "use-immer"
 import UploadCover from "@/components/page/write/UploadCover"
-import PageHeader from "@/components/module/common/PageHeader"
-import {Button} from "@/components/ui/button"
+import PageHeader from "@/components/module/PageHeader"
+import {Button, Checkbox, Divider, Dropdown, Input, Menu, Message, Tag, Typography} from "@arco-design/web-react"
 import {useEffect, useRef, useState} from "react"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {Badge} from "@/components/ui/badge"
 import useAxios from "@/lib/api/useAxios"
 import dayjs from "@/utils/dayjs"
-import {useToast} from "@/hooks/use-toast"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
-import {ToastAction} from "@/components/ui/toast"
-import {Input} from "@/components/ui/input"
-import {Separator} from "@/components/ui/separator"
-import {PlateEditor} from "@/components/module/editor/plate-editor"
-import {plateToHtml} from "@/components/plate-ui/export-toolbar-button"
 import LoadingBox from "@/components/common/LoadingBox"
+import dynamic from "next/dynamic"
+
+const EditorBlock = dynamic(async () => (await import("@/components/module/EditorBlock")).default, {
+    ssr: false,
+})
 
 const Page = () => {
     const [dataForm, setDataForm] = useImmer({
@@ -36,7 +28,6 @@ const Page = () => {
     const [category, setCategory] = useImmer([])
     const [loading, setLoading] = useState(false)
     const [saveTime, setSaveTime] = useState(0)
-    const {toast} = useToast()
     const router = useRouter()
     const pathname = usePathname()
     const query = useSearchParams()
@@ -52,10 +43,12 @@ const Page = () => {
                     setDataForm({
                         ...dataForm,
                         ...(res.data?.post || {}),
-                        categories: res.data?.category,
+                        categories: res.data?.category.map((category) => category.id),
                     })
                     if (editorRef.current) {
-                        editorRef.current.setValue(res.data?.post?.content || [])
+                        editorRef.current.render({
+                            blocks: JSON.parse(res.data?.post?.content) || [],
+                        })
                     }
                 })
                 .finally(() => {
@@ -79,13 +72,13 @@ const Page = () => {
         getCategoryData()
     }, [])
 
-    const handleChangeCategory = (cate, checked) => {
+    const handleChangeCategory = (cate) => {
         setDataForm((d) => {
-            const findIndex = d.categories.findIndex((c) => c.id === cate.id)
-            if (!checked) {
+            const findIndex = d.categories.findIndex((c) => c === cate.id)
+            if (findIndex !== -1) {
                 d.categories.splice(findIndex, 1)
             } else {
-                d.categories.push(cate)
+                d.categories.push(cate.id)
             }
         })
     }
@@ -99,40 +92,26 @@ const Page = () => {
     const handleSubmit = async (status = "draft") => {
         if (!editorRef.current) return
 
-        const editor_value = editorRef.current.getValue()
-        const content_html = await plateToHtml(editor_value)
+        const content = (await editorRef.current.save()).blocks
 
         useAxios
             .post("/api/admin/posts", {
                 ...dataForm,
-                content: editor_value,
-                content_html,
-                categories: dataForm.categories.map((c) => c.id),
+                content,
+                categories: dataForm.categories,
                 status,
             })
             .then((res) => {
                 setDataForm((d) => {
                     d.id = res.data.id
                 })
-                toast({
-                    title: "保存成功",
-                    variant: "info",
-                    action:
-                        status !== "draft" ? (
-                            <ToastAction onClick={() => router.push("/post/" + res.data.id)} altText="查看文章">
-                                查看
-                            </ToastAction>
-                        ) : null,
-                })
+                Message.success("保存成功")
                 setSaveTime(Date.now())
                 router.replace(pathname + "?postId=" + res.data.id)
             })
             .catch((err) => {
-                toast({
-                    title: "保存失败",
-                    description: err,
-                    variant: "destructive",
-                })
+                console.error(err)
+                Message.error("保存失败")
             })
     }
 
@@ -146,9 +125,13 @@ const Page = () => {
                 .post("/api/admin/category", {
                     name: categoryInput,
                 })
-                .then(() => {
+                .then((res) => {
                     setCategoryInput("")
                     getCategoryData()
+
+                    setDataForm((d) => {
+                        d.categories.push(res.data.id)
+                    })
                 })
         }
     }
@@ -172,14 +155,14 @@ const Page = () => {
                         action={
                             <div className="flex items-center gap-2">
                                 {dataForm.id && (
-                                    <Button size="sm" variant="link" className="pl-0 text-muted-foreground">
-                                        <a href="/compose/write">新文章</a>
+                                    <Button color="secondary" href={"/compose/write"} type="text">
+                                        新文章
                                     </Button>
                                 )}
-                                <Button onClick={() => handleSubmit("draft")} size="sm" variant="ghost">
+                                <Button onClick={() => handleSubmit("draft")} type="text">
                                     草稿
                                 </Button>
-                                <Button onClick={() => handleSubmit("publish")} size="sm">
+                                <Button type="primary" onClick={() => handleSubmit("publish")}>
                                     {dataForm.status === "publish" ? "保存" : "发布"}
                                 </Button>
                             </div>
@@ -198,49 +181,69 @@ const Page = () => {
                     </div>
                     <div className="flex w-full items-center justify-between border-b px-4 py-2">
                         <div className="flex items-center gap-1">
-                            {dataForm.categories.map((category) => (
-                                <Badge
-                                    className="cursor-pointer"
-                                    variant="secondary"
-                                    onClick={() => handleChangeCategory(category, false)}
-                                    key={category.id}
-                                >
-                                    {category.name}
-                                </Badge>
-                            ))}
+                            {category
+                                .filter((c) => {
+                                    return dataForm.categories.includes(c.id)
+                                })
+                                .map((category) => (
+                                    <Tag
+                                        checkable
+                                        defaultChecked
+                                        onCheck={() => handleChangeCategory(category)}
+                                        key={category.id}
+                                    >
+                                        # {category.name}
+                                    </Tag>
+                                ))}
                         </div>
                         <div>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        分类
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-auto">
-                                    {category.map((c) => (
-                                        <DropdownMenuCheckboxItem
-                                            key={c.id}
-                                            checked={dataForm.categories.findIndex((item) => item.id === c.id) !== -1}
-                                            onCheckedChange={(v) => handleChangeCategory(c, v)}
-                                        >
-                                            {c.name}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                                    <Separator className="my-2" />
-                                    <div className="px-2 pb-1">
-                                        <Input
-                                            value={categoryInput}
-                                            onChange={(e) => setCategoryInput(e.target.value)}
-                                            onKeyDown={handleKeyDown}
-                                            className="h-8 text-sm"
-                                            placeholder="添加新分类"
-                                        />
-                                    </div>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Dropdown
+                                trigger="click"
+                                droplist={
+                                    <Menu
+                                        onClickMenuItem={() => {
+                                            return false
+                                        }}
+                                    >
+                                        {category?.length ? (
+                                            category.map((c) => (
+                                                <Menu.Item
+                                                    onClick={() => handleChangeCategory(c)}
+                                                    value={c.id}
+                                                    key={c.id}
+                                                >
+                                                    <Checkbox
+                                                        checked={
+                                                            dataForm.categories.findIndex((item) => item === c.id) !==
+                                                            -1
+                                                        }
+                                                    >
+                                                        {c.name}
+                                                    </Checkbox>
+                                                </Menu.Item>
+                                            ))
+                                        ) : (
+                                            <Typography.Text className="flex justify-center pt-2" type="secondary">
+                                                暂无分类
+                                            </Typography.Text>
+                                        )}
+                                        <Divider />
+                                        <div className="px-2 pb-1">
+                                            <Input
+                                                value={categoryInput}
+                                                onChange={(value) => setCategoryInput(value)}
+                                                onKeyDown={handleKeyDown}
+                                                placeholder="添加新分类"
+                                            />
+                                        </div>
+                                    </Menu>
+                                }
+                            >
+                                <Button type="text">分类</Button>
+                            </Dropdown>
                         </div>
                     </div>
-                    <div className="my-5 px-4">
+                    <div className="my-8 px-5">
                         <input
                             value={dataForm.title}
                             onChange={(e) =>
@@ -253,8 +256,8 @@ const Page = () => {
                             placeholder="标题"
                         />
                     </div>
-                    <div className="pb-12">
-                        <PlateEditor ref={editorRef} />
+                    <div className="px-5">
+                        <EditorBlock onReady={(instance) => (editorRef.current = instance)} />
                     </div>
                 </div>
             </LoadingBox>

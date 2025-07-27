@@ -1,4 +1,5 @@
-import {timestamp} from "drizzle-orm/pg-core"
+import {boolean, timestamp} from "drizzle-orm/mysql-core"
+import {sql} from "drizzle-orm"
 
 export function generateUniqueString(length: number = 12): string {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -11,7 +12,11 @@ export function generateUniqueString(length: number = 12): string {
 }
 
 export const timestamps = {
-    updated_at: timestamp({precision: 6, withTimezone: true}).defaultNow(),
-    created_at: timestamp({precision: 6, withTimezone: true}).defaultNow().notNull(),
-    deleted_at: timestamp({precision: 6, withTimezone: true}),
+    created_at: timestamp({mode: "string", fsp: 3})
+        .default(sql`CURRENT_TIMESTAMP(3)`)
+        .notNull(),
+    updated_at: timestamp({mode: "string", fsp: 3})
+        .default(sql`CURRENT_TIMESTAMP(3)`)
+        .$onUpdate(() => sql`CURRENT_TIMESTAMP(3)`),
+    deleted: boolean().default(false).notNull(),
 }

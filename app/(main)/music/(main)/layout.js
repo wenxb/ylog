@@ -1,6 +1,6 @@
-import MainColumn from "@/components/module/common/MainColumn"
+import MainColumn from "@/components/module/MainColumn"
 import NavTabs from "@/components/page/music/NavTabs"
-import PageHeader from "@/components/module/common/PageHeader"
+import PageHeader from "@/components/module/PageHeader"
 
 const Layout = ({children}) => {
     return (

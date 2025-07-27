@@ -1,185 +1,175 @@
 import {
     bigint,
     boolean,
-    index,
-    integer,
-    jsonb,
-    pgEnum,
-    pgTable,
+    int,
+    json,
+    mysqlEnum,
+    mysqlTable,
     primaryKey,
     serial,
     text,
     timestamp,
     uniqueIndex,
-    uuid,
     varchar,
-} from "drizzle-orm/pg-core"
+} from "drizzle-orm/mysql-core"
 import type {AdapterAccountType} from "next-auth/adapters"
 import {timestamps} from "@/lib/db/util"
 
-export const rolesEnum = pgEnum("roles", ["guest", "user", "admin"])
-export const postStatusEnum = pgEnum("status", ["draft", "publish"])
+export const rolesEnum = mysqlEnum("role", ["guest", "user", "admin"])
+export const postStatusEnum = mysqlEnum("status", ["draft", "publish"])
 
-export const Settings = pgTable("settings", {
+export const Settings = mysqlTable("settings", {
     id: serial().primaryKey(),
-    key: varchar("key").unique().notNull(),
+    key: varchar("setting_key", {length: 255}).unique().notNull(),
     value: text("value"),
 })
 
-export const PostComments = pgTable("post_comments", {
+export const PostComments = mysqlTable("post_comments", {
     id: serial().primaryKey(),
     content: text("content").notNull(),
-    userId: uuid("user_id")
+    userId: varchar("user_id", {length: 255})
         .notNull()
         .references(() => Users.id, {onDelete: "cascade"}),
-    parentId: integer("parent_id"),
-    postId: integer("post_id")
+    parentId: bigint("parent_id", {unsigned: true, mode: "number"}),
+    postId: bigint("post_id", {unsigned: true, mode: "number"})
         .references(() => Posts.id, {onDelete: "cascade"})
         .notNull(),
-    ip: varchar("ip"),
+    ip: varchar("ip", {length: 255}),
     ...timestamps,
 })
 
-export const Posts = pgTable(
-    "posts",
-    {
-        id: serial().primaryKey(),
-        title: varchar({length: 256}),
-        cover: varchar("cover"),
-        summary: text("summary"),
-        content: jsonb("content"),
-        contentHtml: text("content_html"),
-        views: bigint({mode: "number"}).default(0),
-        status: postStatusEnum().default("draft"),
-        userId: uuid("user_id")
-            .notNull()
-            .references(() => Users.id, {onDelete: "cascade"}),
-        ...timestamps,
-    },
-    (table) => [index("title_idx").on(table.title)]
-)
-
-export const Easay = pgTable("easays", {
+export const Posts = mysqlTable("posts", {
     id: serial().primaryKey(),
-    content: text(),
-    userId: uuid("user_id")
+    title: varchar("title", {length: 255}),
+    cover: varchar("cover", {length: 255}),
+    summary: varchar("summary", {length: 255}),
+    content: json("content"),
+    views: bigint("views", {mode: "number", unsigned: true}).default(0),
+    status: postStatusEnum.default("draft"),
+    userId: varchar("user_id", {length: 255})
         .notNull()
         .references(() => Users.id, {onDelete: "cascade"}),
     ...timestamps,
 })
 
-export const EasayMedia = pgTable("easay_medias", {
+export const Easay = mysqlTable("easays", {
     id: serial().primaryKey(),
-    easayId: integer("easay_id")
+    content: text(),
+    userId: varchar("user_id", {length: 255})
+        .notNull()
+        .references(() => Users.id, {onDelete: "cascade"}),
+    ...timestamps,
+})
+
+export const EasayMedia = mysqlTable("easay_medias", {
+    id: serial().primaryKey(),
+    easayId: bigint("easay_id", {unsigned: true, mode: "number"})
         .notNull()
         .references(() => Easay.id, {onDelete: "cascade"}),
-    url: varchar(),
-    type: varchar("type"),
+    url: varchar("url", {length: 255}),
+    type: varchar("type", {length: 255}),
 })
 
-export const Category = pgTable("categories", {
+export const Category = mysqlTable("categories", {
     id: serial().primaryKey(),
-    name: varchar().unique().notNull(),
+    name: varchar("name", {length: 255}).unique().notNull(),
 })
 
-export const Users = pgTable(
+export const Users = mysqlTable(
     "users",
     {
-        id: uuid("id")
+        id: varchar("id", {length: 255})
             .primaryKey()
             .$defaultFn(() => crypto.randomUUID()),
-        name: varchar("name"),
-        email: varchar("email").notNull().unique(),
-        role: rolesEnum().default("user"),
-        emailVerified: timestamp("emailVerified", {mode: "date", withTimezone: true}),
-        image: varchar("image"),
-        ...timestamps,
+        name: varchar("name", {length: 255}),
+        email: varchar("email", {length: 255}).notNull().unique(),
+        role: rolesEnum.default("user"),
+        emailVerified: timestamp("emailVerified", {mode: "date", fsp: 3}),
+        image: varchar("image", {length: 255}),
     },
     (table) => [uniqueIndex("email_idx").on(table.email)]
 )
 
-export const PostToCategory = pgTable(
+export const PostToCategory = mysqlTable(
     "posts_to_category",
     {
-        postId: integer("post_id")
+        postId: bigint("post_id", {unsigned: true, mode: "number"})
             .notNull()
             .references(() => Posts.id, {onDelete: "cascade"}),
-        categoryId: integer("category_id")
+        categoryId: bigint("category_id", {unsigned: true, mode: "number"})
             .notNull()
             .references(() => Category.id, {onDelete: "cascade"}),
     },
     (t) => [primaryKey({columns: [t.postId, t.categoryId]})]
 )
 
-export const Accounts = pgTable(
+export const Accounts = mysqlTable(
     "account",
     {
-        userId: uuid("userId")
+        userId: varchar("userId", {length: 255})
             .notNull()
             .references(() => Users.id, {onDelete: "cascade"}),
-        type: varchar("type").$type<AdapterAccountType>().notNull(),
-        provider: varchar("provider").notNull(),
-        providerAccountId: varchar("providerAccountId").notNull(),
-        refresh_token: varchar("refresh_token"),
-        access_token: varchar("access_token"),
-        expires_at: integer("expires_at"),
-        token_type: varchar("token_type"),
-        scope: varchar("scope"),
-        id_token: varchar("id_token"),
-        session_state: varchar("session_state"),
+        type: varchar("type", {length: 255}).$type<AdapterAccountType>().notNull(),
+        provider: varchar("provider", {length: 255}).notNull(),
+        providerAccountId: varchar("providerAccountId", {length: 255}).notNull(),
+        refresh_token: varchar("refresh_token", {length: 255}),
+        access_token: varchar("access_token", {length: 255}),
+        expires_at: int("expires_at"),
+        token_type: varchar("token_type", {length: 255}),
+        scope: varchar("scope", {length: 255}),
+        id_token: varchar("id_token", {length: 2048}),
+        session_state: varchar("session_state", {length: 255}),
     },
-    (account) => [
-        {
-            compoundKey: primaryKey({
-                columns: [account.provider, account.providerAccountId],
-            }),
-        },
-    ]
+    (account) => ({
+        compoundKey: primaryKey({
+            columns: [account.provider, account.providerAccountId],
+        }),
+    })
 )
 
-export const Sessions = pgTable("session", {
-    sessionToken: text("sessionToken").primaryKey(),
-    userId: uuid("userId")
+export const Sessions = mysqlTable("session", {
+    sessionToken: varchar("sessionToken", {length: 255}).primaryKey(),
+    userId: varchar("userId", {length: 255})
         .notNull()
         .references(() => Users.id, {onDelete: "cascade"}),
-    expires: timestamp("expires", {mode: "date", withTimezone: true}).notNull(),
+    expires: timestamp("expires", {mode: "date"}).notNull(),
 })
 
-export const VerificationTokens = pgTable(
+export const VerificationTokens = mysqlTable(
     "verificationToken",
     {
-        identifier: varchar("identifier").notNull(),
-        token: varchar("token").notNull(),
-        expires: timestamp("expires", {mode: "date", withTimezone: true}).notNull(),
+        identifier: varchar("identifier", {length: 255}).notNull(),
+        token: varchar("token", {length: 255}).notNull(),
+        expires: timestamp("expires", {mode: "date"}).notNull(),
     },
-    (verificationToken) => [
-        {
-            compositePk: primaryKey({
-                columns: [verificationToken.identifier, verificationToken.token],
-            }),
-        },
-    ]
+    (verificationToken) => ({
+        compositePk: primaryKey({
+            columns: [verificationToken.identifier, verificationToken.token],
+        }),
+    })
 )
 
-export const Authenticators = pgTable(
+export const Authenticators = mysqlTable(
     "authenticator",
     {
-        credentialID: text("credentialID").notNull().unique(),
-        userId: uuid("userId")
+        credentialID: varchar("credentialID", {length: 255}).notNull().unique(),
+        userId: varchar("userId", {length: 255})
             .notNull()
             .references(() => Users.id, {onDelete: "cascade"}),
-        providerAccountId: varchar("providerAccountId").notNull(),
-        credentialPublicKey: varchar("credentialPublicKey").notNull(),
-        counter: integer("counter").notNull(),
-        credentialDeviceType: varchar("credentialDeviceType").notNull(),
+        providerAccountId: varchar("providerAccountId", {length: 255}).notNull(),
+        credentialPublicKey: varchar("credentialPublicKey", {
+            length: 255,
+        }).notNull(),
+        counter: int("counter").notNull(),
+        credentialDeviceType: varchar("credentialDeviceType", {
+            length: 255,
+        }).notNull(),
         credentialBackedUp: boolean("credentialBackedUp").notNull(),
-        transports: varchar("transports"),
+        transports: varchar("transports", {length: 255}),
     },
-    (authenticator) => [
-        {
-            compositePK: primaryKey({
-                columns: [authenticator.userId, authenticator.credentialID],
-            }),
-        },
-    ]
+    (authenticator) => ({
+        compositePk: primaryKey({
+            columns: [authenticator.userId, authenticator.credentialID],
+        }),
+    })
 )

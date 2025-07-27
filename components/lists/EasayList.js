@@ -2,49 +2,40 @@
 import MediaList from "@/components/lists/MediaList"
 import dayjs from "@/utils/dayjs"
 import DOMPurify from "dompurify"
-import {Button} from "@/components/ui/button"
+import {Button, Message, Modal} from "@arco-design/web-react"
 import {usePathname, useRouter} from "next/navigation"
 import Auth from "@/utils/Auth"
 import useAxios from "@/lib/api/useAxios"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import {useToast} from "@/hooks/use-toast"
-import EmptyContent from "@/components/module/common/EmptyContent"
+import EmptyContent from "@/components/module/EmptyContent"
 
 const Item = ({item, actionAfterFlush = false}) => {
     const safeHtml = DOMPurify.sanitize(item.content)
     const router = useRouter()
     const pathname = usePathname()
-    const {toast} = useToast()
 
     const handleRemove = (id) => {
-        useAxios
+        return useAxios
             .delete("/api/admin/easay/" + id)
             .then(() => {
-                toast({
-                    title: "删除成功",
-                    variant: "info",
-                })
+                Message.success("删除成功")
                 if (actionAfterFlush) {
                     router.replace(pathname)
                 }
             })
-            .catch((e) => {
-                toast({
-                    title: "删除失败",
-                    description: e,
-                    variant: "destructive",
-                })
+            .catch(() => {
+                Message.error("删除失败")
             })
+    }
+
+    const handleShowDelete = (id) => {
+        Modal.confirm({
+            title: "确认删除",
+            content: "确定要删除这条数据吗？此操作无法撤销。",
+            okButtonProps: {status: "danger"},
+            onOk: () => {
+                return handleRemove(id)
+            },
+        })
     }
 
     return (
@@ -60,27 +51,13 @@ const Item = ({item, actionAfterFlush = false}) => {
                     <time>{dayjs(item?.created_at).fromNow()}</time>
                 </div>
                 {Auth.isAdmin() && (
-                    <div className="invisible group-hover:visible max-sm:visible">
-                        <Button onClick={() => router.push("/easay?id=" + item.id)} size="sm" variant="link">
+                    <div className="invisible space-x-2! group-hover:visible max-sm:visible">
+                        <Button type={"text"} onClick={() => router.push("/easay?id=" + item.id)}>
                             编辑
                         </Button>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button size="sm" variant="link" className="text-red-500">
-                                    删除
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>确认删除</AlertDialogTitle>
-                                    <AlertDialogDescription>确定要删除吗？此操作不可恢复</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>取消</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleRemove(item.id)}>确定</AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                        <Button type={"secondary"} status={"danger"} onClick={() => handleShowDelete(item.id)}>
+                            删除
+                        </Button>
                     </div>
                 )}
             </div>
@@ -94,7 +71,7 @@ const EasayList = ({data = [], actionAfterFlush = false}) => {
             {data.length ? (
                 data.map((item) => <Item actionAfterFlush={actionAfterFlush} key={item.id} item={item} />)
             ) : (
-                <EmptyContent />
+                <EmptyContent text={"博客主人正在码字中，敬请期待！"} />
             )}
         </div>
     )

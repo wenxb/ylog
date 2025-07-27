@@ -1,6 +1,6 @@
 import {db} from "@/lib/db"
 import {Category} from "@/lib/db/schema"
-import {eq} from "drizzle-orm"
+import {eq, sql} from "drizzle-orm"
 
 export const GET = async (req) => {
     const searchParams = req.nextUrl.searchParams
@@ -14,19 +14,7 @@ export const GET = async (req) => {
             .then((result) => result[0])
 
         if (!record) {
-            const insert = await db
-                .insert(Category)
-                .values({
-                    name: name,
-                })
-                .returning({
-                    id: Category.id,
-                    name: Category.name,
-                })
-                .onConflictDoNothing({
-                    target: Category.name,
-                })
-            record = insert[0]
+            record = await db.execute(sql`INSERT IGNORE INTO categorys (name) VALUES (${name})`)
         }
         return Response.json(record)
     } catch (e) {

@@ -1,6 +1,6 @@
 import React from "react"
-import MainColumn from "@/components/module/common/MainColumn"
-import PageHeader from "@/components/module/common/PageHeader"
+import MainColumn from "@/components/module/MainColumn"
+import PageHeader from "@/components/module/PageHeader"
 
 export const metadata = {
     title: "导航链接",

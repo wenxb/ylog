@@ -63,21 +63,25 @@ export async function POST(req) {
             .from(Category)
             .where(eq(Category.name, result.data.name))
             .then((res) => res[0])
+
         if (record) {
             return Response.json({id: record.id})
         }
 
-        await db
+        const insertResult = await db
             .insert(Category)
             .values({...result.data})
-            .onConflictDoUpdate({
-                target: Category.id,
+            .onDuplicateKeyUpdate({
                 set: {
                     name: result.data.name,
                 },
             })
+            .$returningId()
+            .then((res) => res[0])
 
-        return Response.json({})
+        return Response.json({
+            id: insertResult.id,
+        })
     } catch (err) {
         return Response.json({error: err.message}, {status: 500})
     }

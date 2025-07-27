@@ -26,15 +26,20 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
     ],
     events: {
         createUser: async ({user}) => {
-            const adminUser = await getAdminUser(true)
+            const adminUser = await getAdminUser()
             if (!adminUser) {
                 user.role = "admin"
-                await db
-                    .update(Users)
-                    .set({
-                        role: "admin",
-                    })
-                    .where(eq(Users.id, user.id))
+
+                try {
+                    await db
+                        .update(Users)
+                        .set({
+                            role: "admin",
+                        })
+                        .where(eq(Users.id, user.id))
+                } catch (err) {
+                    console.error("修改失败")
+                }
             }
         },
     },

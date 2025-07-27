@@ -1,6 +1,6 @@
 "use client"
-import MainColumn from "@/components/module/common/MainColumn"
-import PageHeaderWrap from "@/components/module/common/PageHeaderWrap"
+import MainColumn from "@/components/module/MainColumn"
+import PageHeaderWrap from "@/components/module/PageHeaderWrap"
 import PlayListHeader from "@/components/page/music/PlayListHeader"
 import useSWR from "swr"
 import PlayListBody from "@/components/page/music/PlayListBody"
@@ -11,7 +11,7 @@ const Page = () => {
 
     return (
         <MainColumn>
-            <PageHeaderWrap barSlot={<div className="font-bold text-xl">{data?.title}</div>} scrollShowBarSlot>
+            <PageHeaderWrap barSlot={<div className="text-xl font-bold">{data?.title}</div>} scrollShowBarSlot>
                 <PlayListHeader onPlayAll={() => playAllSongs(data?.songs)} loading={isLoading} data={data} />
             </PageHeaderWrap>
             <PlayListBody songs={data?.songs} count={data?.songsCount} loading={isLoading} />

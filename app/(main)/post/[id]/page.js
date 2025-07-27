@@ -1,32 +1,30 @@
 import {notFound} from "next/navigation"
-import MainColumn from "@/components/module/common/MainColumn"
+import MainColumn from "@/components/module/MainColumn"
 import Link from "next/link"
-import PageHeaderWrap from "@/components/module/common/PageHeaderWrap"
+import PageHeaderWrap from "@/components/module/PageHeaderWrap"
 import SideRightWrap from "@/components/sideRight/SideRightWrap"
 import PostToc from "@/components/common/PostToc"
 import dayjs from "@/utils/dayjs"
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip"
-import {Badge} from "@/components/ui/badge"
 import {ClockIcon, EyeIcon, MessageSquareMoreIcon} from "lucide-react"
 import {db} from "@/lib/db"
 import {Category, PostComments, Posts, PostToCategory} from "@/lib/db/schema"
 import {asc, desc, eq, gt, lt} from "drizzle-orm"
 import HeaderAction from "@/components/page/post/HeaderAction"
 import {getAdminUser, getSettingsByKeys} from "@/utils/server"
-import DOMPurify from "dompurify"
-import {JSDOM} from "jsdom"
-import {getPostFromCache} from "@/lib/db/module/posts"
-import "@/components/plate-ui/code-block-element.css"
+import {getPost} from "@/lib/db/module/posts"
 import PostComment from "@/components/page/post/PostComment"
 import {formatCount} from "@/utils"
-import PageTitle from "@/components/module/common/PageTitle"
+import PageTitle from "@/components/module/PageTitle"
 import {auth} from "@/auth"
+import EditorJsRender from "@/components/module/EditorJsRender"
+import ClientTag from "@/components/common/ClientTag"
+import ClientTooltip from "@/components/common/ClientTooltip"
 
 async function getPostFromParams(params) {
     const session = await auth()
     let id = (await params)?.id
 
-    const post = await getPostFromCache(id)
+    const post = await getPost(id)
     if (!post) return null
     if (post.status === "draft" && !session) return null
 
@@ -135,25 +133,11 @@ export default async function PostPage({params}) {
     const commentCount = await getPostCommentNum(post?.id)
 
     const config = await getSettingsByKeys(["site_url", "enable_comment"])
-    const window = new JSDOM("").window
-    const purify = DOMPurify(window)
-    purify.addHook("afterSanitizeAttributes", (node) => {
-        if (node.nodeName === "A" && !node.getAttribute("target")) {
-            node.setAttribute("target", "_blank")
-        }
-    })
-
-    const safeHtml = purify.sanitize(post.contentHtml || "")
 
     return (
         <>
             <MainColumn className="pb-10">
-                <PageHeaderWrap
-                    scrollShowBarSlot={!post.cover}
-                    noPadding
-                    barSlot={<div className={"line-clamp-1 text-xl font-semibold"}>{post.title}</div>}
-                    action={<HeaderAction postId={post.id} />}
-                >
+                <PageHeaderWrap scrollShowBarSlot={!post.cover} noPadding action={<HeaderAction postId={post.id} />}>
                     {post?.cover && (
                         <div className="relative w-full">
                             <div className="pb-[52%]"></div>
@@ -163,7 +147,7 @@ export default async function PostPage({params}) {
                         </div>
                     )}
                     <div className="px-4 pb-4">
-                        {Array.isArray(post.category) && post.category.length > 0 && (
+                        {post.category && (
                             <div className="mt-3 flex gap-2">
                                 {post.category.map((category) => (
                                     <Link
@@ -171,9 +155,7 @@ export default async function PostPage({params}) {
                                         className="no-underline"
                                         key={category.id}
                                     >
-                                        <Badge className="font-normal" variant="secondary">
-                                            {category.name}
-                                        </Badge>
+                                        <ClientTag>#{category.name}</ClientTag>
                                     </Link>
                                 ))}
                             </div>
@@ -181,17 +163,17 @@ export default async function PostPage({params}) {
                         <PageTitle>{post.title}</PageTitle>
                         <div className="flex w-full flex-col items-start text-muted-foreground">
                             <div className="flex items-center gap-3 text-sm">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className="flex cursor-default items-center gap-1">
-                                            <ClockIcon className="size-4" />
-                                            <time>{dayjs(meta.created_at).format("YYYY-MM-DD")}</time>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
+                                <ClientTooltip
+                                    mini
+                                    content={
                                         <span>更新日期：{dayjs(meta.updated_at).format("YYYY-MM-DD HH:mm:ss")}</span>
-                                    </TooltipContent>
-                                </Tooltip>
+                                    }
+                                >
+                                    <div className="flex cursor-default items-center gap-1">
+                                        <ClockIcon className="size-4" />
+                                        <time>{dayjs(meta.created_at).format("YYYY-MM-DD")}</time>
+                                    </div>
+                                </ClientTooltip>
                                 <div className="flex items-center gap-1">
                                     <EyeIcon className="size-4" />
                                     <span>{formatCount(meta?.views || 0)}</span>
@@ -201,22 +183,16 @@ export default async function PostPage({params}) {
                                     <span>{formatCount(commentCount || 0)}</span>
                                 </div>
                                 {post.status === "draft" && (
-                                    <Badge
-                                        className="bg-yellow-200 px-1.5 text-[11px] leading-none text-yellow-800 hover:bg-yellow-200"
-                                        variant="secondary"
-                                    >
+                                    <div className="rounded bg-yellow-200 px-1.5 py-1 text-[11px] leading-none text-yellow-800 hover:bg-yellow-200">
                                         草稿
-                                    </Badge>
+                                    </div>
                                 )}
                             </div>
                         </div>
                     </div>
                 </PageHeaderWrap>
-                <article
-                    id="article-content"
-                    className="prose min-h-52 max-w-full flex-grow p-4 text-base prose-blue dark:prose-invert prose-figure:my-0 prose-pre:text-inherit prose-tr:border-b-0 prose-hr:my-0"
-                >
-                    <div dangerouslySetInnerHTML={{__html: safeHtml}}></div>
+                <article id="article-content" className="prose min-h-52 max-w-full p-4 dark:prose-invert">
+                    {post.content && <EditorJsRender data={{blocks: JSON.parse(post.content)}} />}
                 </article>
                 <div className={"mt-6 flex flex-col border-t p-4"}>
                     <div className={"text-base"}>{post.title}</div>

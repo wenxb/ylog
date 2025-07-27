@@ -4,10 +4,6 @@ import createMDX from "@next/mdx"
 const nextConfig = {
     reactStrictMode: false,
     webpack(config) {
-        config.module.rules.push({
-            test: /\.ya?ml$/,
-            use: 'yaml-loader'
-        })
 
         return config
     },
@@ -15,7 +11,7 @@ const nextConfig = {
 }
 
 const withMDX = createMDX({
-    // Add markdown plugins here, as desired
+
 })
 
 export default withMDX(nextConfig)

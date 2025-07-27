@@ -1,5 +1,5 @@
 import SideMenu from "@/components/sidebar/SideMenu"
-import GlobalBottomNav from "@/components/module/common/GlobalBottomNav"
+import GlobalBottomNav from "@/components/module/GlobalBottomNav"
 
 const Layout = ({children}) => {
     return (

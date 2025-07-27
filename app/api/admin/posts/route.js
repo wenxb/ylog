@@ -4,13 +4,11 @@ import {Category, Posts, PostToCategory} from "@/lib/db/schema"
 import {desc, eq, inArray} from "drizzle-orm"
 import {pageVer} from "@/lib/server/ver"
 import {getAdminUser} from "@/utils/server"
-import {getRedisClient} from "@/lib/redis/client"
 
 const verBody = z.object({
     id: z.number().optional(),
     title: z.string().min(1, "标题不能为空"),
     content: z.array(z.any()),
-    content_html: z.string(),
     summary: z.string().optional().default(""),
     cover: z.string().optional().default(""),
     status: z.enum(["draft", "publish"]),
@@ -18,8 +16,29 @@ const verBody = z.object({
     date: z.string().optional(),
 })
 
+function generateSummary(data, length = 50) {
+    // 1. 提取文本块
+    const text = data
+        .filter((block) => ["paragraph", "header", "list"].includes(block.type))
+        .map((block) => {
+            if (block.type === "list") {
+                return block.data.items.join(" ")
+            }
+            return block.data.text
+        })
+        .join(" ")
+
+    // 2. 去掉 HTML 标签
+    let pureText = text.replace(/<[^>]+>/g, "")
+
+    // 3. 去掉换行符（\n \r）
+    pureText = pureText.replace(/[\r\n]/g, "")
+
+    // 4. 截取前 50 字符
+    return pureText.length > length ? pureText.slice(0, length) + "…" : pureText
+}
+
 export const POST = async (req) => {
-    const redis = await getRedisClient()
     const userId = (await getAdminUser()).id
     const body = await req.json()
 
@@ -28,8 +47,7 @@ export const POST = async (req) => {
     const parseBody = result.data
 
     // 生成摘要
-    const textContent = parseBody.content_html.replace(/<\/h[1-6]>/g, "$& ").replace(/<[^>]*>/g, "")
-    parseBody.summary = textContent.slice(0, 50).replaceAll("\n", " ")
+    parseBody.summary = generateSummary(parseBody.content)
 
     try {
         let postId
@@ -37,7 +55,6 @@ export const POST = async (req) => {
             id: parseBody.id,
             title: parseBody.title,
             content: JSON.stringify(parseBody.content),
-            contentHtml: parseBody.content_html,
             summary: parseBody.summary,
             cover: parseBody.cover,
             status: parseBody.status,
@@ -52,12 +69,12 @@ export const POST = async (req) => {
                     userId,
                     ...values,
                 })
-                .onConflictDoUpdate({
-                    target: Posts.id,
+                .onDuplicateKeyUpdate({
                     set: values,
                 })
-                .returning({id: Posts.id})
-            postId = record[0].id
+                .$returningId()
+
+            postId = record[0]?.id
 
             await tx.delete(PostToCategory).where(eq(PostToCategory.postId, postId))
             for (const category of parseBody.categories) {
@@ -67,8 +84,6 @@ export const POST = async (req) => {
                 })
             }
         })
-
-        await redis.json.del(`posts:${postId}`)
 
         return Response.json({
             id: postId,

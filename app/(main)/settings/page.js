@@ -1,6 +1,6 @@
 "use client"
-import MainColumn from "@/components/module/common/MainColumn"
-import PageHeader from "@/components/module/common/PageHeader"
+import MainColumn from "@/components/module/MainColumn"
+import PageHeader from "@/components/module/PageHeader"
 import {Label} from "@/components/ui/label"
 import {Textarea} from "@/components/ui/textarea"
 import {Button} from "@/components/ui/button"
@@ -20,7 +20,6 @@ import {Avatar, AvatarImage} from "@/components/ui/avatar"
 import {useFilePicker} from "use-file-picker"
 import matter from "gray-matter"
 import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog"
-import {markdownToPlate, plateToHtml} from "@/components/plate-ui/export-toolbar-button"
 import LoadingBox from "@/components/common/LoadingBox"
 
 const Title = ({children}) => {
@@ -122,9 +121,7 @@ const Page = () => {
             if (data.date) {
                 item["date"] = new Date(data.date).toISOString()
             }
-            const nodes = markdownToPlate(content)
-            item["content"] = nodes
-            item["content_html"] = await plateToHtml(nodes)
+            // item["content"] = nodes
 
             const {importStatus, ...body} = item
             await useAxios
