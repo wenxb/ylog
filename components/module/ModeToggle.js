@@ -4,9 +4,7 @@ import {useEffect, useState} from "react"
 import {Moon, Sun, SunMoonIcon} from "lucide-react"
 import {useTheme} from "next-themes"
 
-import {Button} from "@/components/ui/button"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip"
+import {Button, Dropdown, Menu, Tooltip} from "@arco-design/web-react"
 
 const selectedClass = "bg-blue-500/10 text-blue-500 focus:bg-blue-500/10 focus:text-blue-500"
 
@@ -17,34 +15,29 @@ export function ModeToggle() {
         setTheme(theme)
     }, [theme])
 
+    const menu = (
+        <Menu onClickMenuItem={(key) => {setTheme(key); setThemed(key)}}>
+            <Menu.Item key="light" className={themed === "light" ? selectedClass : undefined}>
+                <Sun /> 亮色
+            </Menu.Item>
+            <Menu.Item key="dark" className={themed === "dark" ? selectedClass : undefined}>
+                <Moon /> 暗色
+            </Menu.Item>
+            <Menu.Item key="system" className={themed === "system" ? selectedClass : undefined}>
+                <SunMoonIcon /> 自动
+            </Menu.Item>
+        </Menu>
+    )
+
     return (
-        <DropdownMenu>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            {themed === "dark" && <Moon />}
-                            {themed === "light" && <Sun />}
-                            {themed === "system" && <SunMoonIcon />}
-                        </Button>
-                    </DropdownMenuTrigger>
-                </TooltipTrigger>
-                <TooltipContent>主题</TooltipContent>
+        <Dropdown droplist={menu} trigger="click" position="br">
+            <Tooltip content="主题">
+                <Button shape="circle" type="text">
+                    {themed === "dark" && <Moon />}
+                    {themed === "light" && <Sun />}
+                    {themed === "system" && <SunMoonIcon />}
+                </Button>
             </Tooltip>
-            <DropdownMenuContent className={"z-[1201] w-40"} align="center">
-                <DropdownMenuItem className={themed === "light" && selectedClass} onClick={() => setTheme("light")}>
-                    <Sun />
-                    亮色
-                </DropdownMenuItem>
-                <DropdownMenuItem className={themed === "dark" && selectedClass} onClick={() => setTheme("dark")}>
-                    <Moon />
-                    暗色
-                </DropdownMenuItem>
-                <DropdownMenuItem className={themed === "system" && selectedClass} onClick={() => setTheme("system")}>
-                    <SunMoonIcon />
-                    自动
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        </Dropdown>
     )
 }
