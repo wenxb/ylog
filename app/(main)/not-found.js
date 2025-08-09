@@ -1,7 +1,7 @@
 import MainColumn from "@/components/module/MainColumn"
+import {Button} from "@/components/ui/button"
 import Link from "next/link"
 import {ShellIcon} from "lucide-react"
-import {Button} from "@arco-design/web-react"
 
 const NotFound = () => {
     return (
@@ -11,11 +11,9 @@ const NotFound = () => {
                     <ShellIcon />
                 </div>
                 <h2 className="text-2xl font-bold">页面不存在</h2>
-                <Link href="/">
-                    <Button type="text" className="text-blue-500">
-                        返回首页
-                    </Button>
-                </Link>
+                <Button asChild variant="link" className="text-blue-500">
+                    <Link href="/">返回首页</Link>
+                </Button>
             </div>
         </MainColumn>
     )

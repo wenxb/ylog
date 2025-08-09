@@ -8,9 +8,10 @@ import {allowImageSuffix, allowVideoSuffix} from "@/lib/constant"
 import {v4 as uuidV4} from "uuid"
 import DraftEditor from "@/components/common/DraftEditor"
 import MediaList from "@/components/lists/MediaList"
+import {Separator} from "@/components/ui/separator"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 import {convertFromHTML} from "draft-convert"
-import {Button, Message, Notification, Divider, Input} from "@arco-design/web-react"
+import {Button, Message, Notification} from "@arco-design/web-react"
 import {IconImage} from "@arco-design/web-react/icon"
 
 const initForm = {
@@ -185,7 +186,7 @@ const UploadEasay = ({onSubmit}) => {
             <div className="py-3">
                 <MediaList data={dataForm.media} onItemRemove={handleRemoveMedia} />
             </div>
-            <Divider />
+            <Separator />
             <div className="-mb-2 flex w-full items-center justify-between pt-2">
                 <div className="-ml-2">
                     <Button

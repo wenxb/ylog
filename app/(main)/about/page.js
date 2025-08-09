@@ -1,9 +1,9 @@
 import MainColumn from "@/components/module/MainColumn"
 import PageHeaderWrap from "@/components/module/PageHeaderWrap"
+import {Button} from "@/components/ui/button"
 import Link from "next/link"
 import {SiBilibili, SiFacebook, SiGithub, SiX} from "@icons-pack/react-simple-icons"
 import {LinkIcon, MailIcon} from "lucide-react"
-import {Button} from "@arco-design/web-react"
 import {getAdminUser, getSettingsByKeys} from "@/utils/server"
 import AboutBody from "@/content/page/about.mdx"
 import {connection} from "next/server"
@@ -43,11 +43,11 @@ const Page = async () => {
         if (!config[key]) return null
 
         return (
-            <Link href={config[key]} target={"_blank"} key={index}>
-                <Button type="text" shape="circle" className={"h-10 w-10 text-xl"}>
+            <Button className={"h-10 w-10 text-xl"} key={index} asChild variant={"ghost"} size={"icon"}>
+                <Link href={config[key]} target={"_blank"}>
                     {icon}
-                </Button>
-            </Link>
+                </Link>
+            </Button>
         )
     })
 

@@ -4,8 +4,9 @@ import SectionTitle from "@/components/module/SectionTitle"
 import useSWR from "swr"
 import {useRouter} from "next/navigation"
 import LoadingBox from "@/components/common/LoadingBox"
+import {Button} from "@/components/ui/button"
 import {RefreshCcwIcon} from "lucide-react"
-import {Button, Tooltip} from "@arco-design/web-react"
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip"
 import {useCallback} from "react"
 import {debounce} from "lodash"
 
@@ -53,10 +54,13 @@ const Page = () => {
             </LoadingBox>
             <div className={"my-3 flex w-full items-center justify-between px-4"}>
                 <div className={"text-xl font-bold"}>推荐歌单</div>
-                <Tooltip content="刷新推荐">
-                    <Button onClick={handleRefresh} type="text" shape="circle">
-                        <RefreshCcwIcon className={"text-foreground/60"} />
-                    </Button>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button onClick={handleRefresh} variant="ghost" size="icon">
+                            <RefreshCcwIcon className={"text-foreground/60"} />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>刷新推荐</TooltipContent>
                 </Tooltip>
             </div>
             <LoadingBox loading={resourceLoading}>

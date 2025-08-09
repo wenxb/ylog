@@ -1,6 +1,6 @@
 import LoadingBox from "@/components/common/LoadingBox"
 import MusicList from "@/components/lists/MusicList"
-import {Button} from "@arco-design/web-react"
+import {Button} from "@/components/ui/button"
 
 const PlayListBody = ({loading, songs, count, isLoadingMore, onLoadMore}) => {
     return (

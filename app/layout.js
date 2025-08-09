@@ -1,6 +1,8 @@
 import "@/styles/index.scss"
 import "@/styles/tailwind.css"
 import {ThemeProvider} from "@/lib/theme-provider"
+import {TooltipProvider} from "@/components/ui/tooltip"
+import {Toaster} from "@/components/ui/toaster"
 import {SWRProvider} from "@/lib/swr-provider"
 import {SessionProvider} from "next-auth/react"
 import {Suspense} from "react"
@@ -66,7 +68,8 @@ export default async function RootLayout({children, modal}) {
                                 enableSystem
                                 disableTransitionOnChange
                             >
-                                {children}
+                                <TooltipProvider>{children}</TooltipProvider>
+                                <Toaster />
                                 <Init />
                                 <InitConfig />
                             </ThemeProvider>

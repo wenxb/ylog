@@ -1,4 +1,4 @@
-import {Button} from "@arco-design/web-react"
+import {Button} from "@/components/ui/button"
 import LoadingBox from "@/components/common/LoadingBox"
 
 const PlayListHeader = ({data, loading, onPlayAll}) => {

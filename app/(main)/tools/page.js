@@ -1,18 +1,17 @@
 import MainColumn from "@/components/module/MainColumn"
+import {Avatar, AvatarImage} from "@/components/ui/avatar"
 import Link from "next/link"
 import {notFound} from "next/navigation"
 import {getSettingsByKeys} from "@/utils/server"
 import PageHeader from "@/components/module/PageHeader"
-import {Avatar} from "@arco-design/web-react"
 
 const ToolItem = ({tool, parentPath}) => {
     return (
         <li>
             <Link href={`/tools/${parentPath}/${tool.path}`} className={"flex rounded-2xl p-2 hover:bg-accent"}>
-                <Avatar
-                    className={"h-12 w-12 rounded-xl border bg-background dark:bg-foreground"}
-                    src={tool.icon}
-                />
+                <Avatar className={"h-12 w-12 rounded-xl border bg-background dark:bg-foreground"}>
+                    <AvatarImage src={tool.icon} alt="" />
+                </Avatar>
                 <div className={"ml-2"}>
                     <div className={"font-semibold"}>{tool.name}</div>
                     <div className={"mt-1 line-clamp-1 text-xs text-neutral-400"}>{tool.desc}</div>

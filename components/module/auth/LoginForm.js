@@ -1,28 +1,51 @@
 "use client"
-import {Form, Input, Button} from "@arco-design/web-react"
+import {Button} from "@/components/ui/button"
+import {zodResolver} from "@hookform/resolvers/zod"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form"
+import {Input} from "@/components/ui/input"
 import {MailIcon} from "lucide-react"
 
 const LoginForm = () => {
-    const [form] = Form.useForm()
+    const formSchema = z.object({
+        email: z.string().email(),
+    })
 
-    const onSubmit = (values) => {}
+    const form = useForm({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            email: "",
+        },
+    })
+
+    // 2. Define a submit handler.
+    function onSubmit(values) {}
 
     return (
-        <Form form={form} onSubmit={onSubmit} layout="vertical" className="space-y-8">
-            <Form.Item
-                field="email"
-                label="邮件地址"
-                rules={[{type: "email", required: true}]}
-                extra="未注册将收到一封电子邮件，然后进行登录"
-            >
-                <Input placeholder="输入邮箱" />
-            </Form.Item>
-            <div className="flex justify-center">
-                <Button htmlType="submit">
-                    <MailIcon />
-                    继续
-                </Button>
-            </div>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>邮件地址</FormLabel>
+                            <FormControl>
+                                <Input placeholder="输入邮箱" {...field} />
+                            </FormControl>
+                            <FormDescription>未注册将收到一封电子邮件，然后进行登录</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <div className="flex justify-center">
+                    <Button type="submit">
+                        <MailIcon />
+                        继续
+                    </Button>
+                </div>
+            </form>
         </Form>
     )
 }
