@@ -1,5 +1,5 @@
 "use client"
-import {Button} from "@/components/ui/button"
+import {Button} from "@arco-design/web-react"
 import {ArrowLeftIcon} from "lucide-react"
 import {useRouter} from "next/navigation"
 import {cn} from "@/utils"
@@ -16,7 +16,7 @@ const PageHeader = ({title, hideBack, secondary, action, children, noPadding = f
             )}
         >
             {!hideBack && (
-                <Button onClick={router.back} variant="ghost" className={"-ml-2"} size="icon">
+                <Button onClick={router.back} type="text" shape="circle" className={"-ml-2"}>
                     <ArrowLeftIcon className={"text-xl"} />
                 </Button>
             )}

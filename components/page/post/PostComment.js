@@ -2,7 +2,7 @@
 import CommentForm from "@/components/module/comment/CommentForm"
 import useAxios from "@/lib/api/useAxios"
 import CommentList from "@/components/lists/CommentList"
-import {useToast} from "@/hooks/use-toast"
+import {Message} from "@arco-design/web-react"
 import {useImmer} from "use-immer"
 import {useEffect, useState} from "react"
 import {useSession} from "next-auth/react"
@@ -13,7 +13,6 @@ import {buildCommentTree} from "@/utils"
 import {Button} from "@arco-design/web-react"
 
 const PostComment = ({id}) => {
-    const {toast} = useToast()
     const [data, setData] = useImmer([])
     const [loading, setLoading] = useState(false)
     const {data: session} = useSession()
@@ -59,10 +58,7 @@ const PostComment = ({id}) => {
                 getData(1, true)
             })
             .catch((err) => {
-                toast({
-                    title: err,
-                    variant: "destructive",
-                })
+                Message.error(err)
             })
             .finally(() => {
                 setLoading(false)

@@ -1,6 +1,5 @@
 "use client"
-import {Slider} from "@/components/ui/slider"
-import {Button} from "@/components/ui/button"
+import {Slider, Button} from "@arco-design/web-react"
 import {
     LyricsLine,
     PauseFill,
@@ -21,21 +20,21 @@ import {useMusicDataStore, useMusicStateStore} from "@/stores/music"
 const MusicControl = () => {
     const playSong = useMusicDataStore((state) => state.playSongData)
     const musicState = useMusicStateStore()
-    const [sliderValue, setSliderValue] = useState([0])
+    const [sliderValue, setSliderValue] = useState(0)
     const canSliderRef = useRef(true)
     const isPlaying = useMusicStateStore((state) => state.isPlaying)
     const isLoading = useMusicStateStore((state) => state.isLoading)
 
     useEffect(() => {
         if (canSliderRef.current && musicState.playTimeData?.bar) {
-            setSliderValue([musicState.playTimeData?.bar])
+            setSliderValue(musicState.playTimeData?.bar)
         }
     }, [musicState.playTimeData?.bar])
 
     // 更新进度条
     const songTimeSliderUpdate = (val) => {
         if (musicState.playTimeData?.duration) {
-            const currentTime = (musicState.playTimeData.duration / 100) * val[0]
+            const currentTime = (musicState.playTimeData.duration / 100) * val
             setPlayed(currentTime)
             setSeek(currentTime)
         }
@@ -88,10 +87,14 @@ const MusicControl = () => {
                     </div>
                     <div className={"mt-3"}>
                         <Slider
-                            onPointerDown={() => (canSliderRef.current = false)}
-                            onPointerUp={() => (canSliderRef.current = true)}
-                            onValueChange={(value) => setSliderValue(value)}
-                            onValueCommit={songTimeSliderUpdate}
+                            onChange={(value) => {
+                                canSliderRef.current = false
+                                setSliderValue(value)
+                            }}
+                            onAfterChange={(value) => {
+                                canSliderRef.current = true
+                                songTimeSliderUpdate(value)
+                            }}
                             value={sliderValue}
                             min={0}
                             max={100}
@@ -115,19 +118,19 @@ const MusicControl = () => {
                             <Button
                                 onClick={() => handleChangePlayIndex("prev")}
                                 className={"h-11 w-11 text-3xl"}
-                                size="icon"
-                                variant="ghost"
+                                type="text"
+                                shape="circle"
                             >
                                 <SkipPreviousFill />
                             </Button>
-                            <Button onClick={playOrPause} className={"h-14 w-14 text-5xl"} size="icon" variant="ghost">
+                            <Button onClick={playOrPause} className={"h-14 w-14 text-5xl"} type="text" shape="circle">
                                 {isPlaying ? <PauseFill /> : <PlayArrowFill />}
                             </Button>
                             <Button
                                 onClick={() => handleChangePlayIndex("next")}
                                 className={"h-11 w-11 text-3xl"}
-                                size="icon"
-                                variant="ghost"
+                                type="text"
+                                shape="circle"
                             >
                                 <SkipNextFill />
                             </Button>
@@ -145,8 +148,8 @@ const MusicControl = () => {
                         </span>
                         <div className={"mx-3 grow"}>
                             <Slider
-                                value={[musicState.playVolume]}
-                                onValueChange={(value) => setVolume(value[0])}
+                                value={musicState.playVolume}
+                                onChange={(value) => setVolume(value)}
                                 max={1}
                                 min={0}
                                 step={0.01}
