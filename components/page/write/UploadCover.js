@@ -1,6 +1,5 @@
 "use client"
 import {CameraIcon, CloudUploadIcon, Trash2Icon} from "lucide-react"
-import {Input} from "@/components/ui/input"
 import {useEffect, useRef, useState} from "react"
 import {getFileExtension} from "@/utils/file"
 import {allowImageSuffix} from "@/lib/constant"
@@ -8,7 +7,7 @@ import useAxios from "@/lib/api/useAxios"
 import LoadingBox from "@/components/common/LoadingBox"
 import isUrl from "is-url"
 import {cn} from "@/utils"
-import {Button, Message, Modal, Typography} from "@arco-design/web-react"
+import {Button, Message, Modal, Typography, Input} from "@arco-design/web-react"
 
 const UploadCover = ({onSuccess, url, onRemove}) => {
     const [show, setShow] = useState(false)
