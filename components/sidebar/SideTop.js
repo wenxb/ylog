@@ -1,20 +1,12 @@
 "use client"
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
 import Link from "next/link"
-import {Button} from "@/components/ui/button"
 import {signOut, useSession} from "next-auth/react"
 import {usePathname, useRouter} from "next/navigation"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {useState} from "react"
 import {LogOutIcon, SettingsIcon} from "lucide-react"
 import Auth from "@/utils/Auth"
 import {LOGIN_URL} from "@/lib/constant"
+import {Avatar, Button, Dropdown, Menu} from "@arco-design/web-react"
 
 const SideTop = () => {
     const [show, setShow] = useState(false)
@@ -41,42 +33,42 @@ const SideTop = () => {
         }
     }
 
+    const droplist = (
+        <Menu>
+            {Auth.isAdmin() && (
+                <>
+                    <Menu.Item
+                        onClick={() => {
+                            router.push("/settings")
+                            setShow(false)
+                        }}
+                    >
+                        <SettingsIcon /> 网站设置
+                    </Menu.Item>
+                    <Menu.Divider />
+                </>
+            )}
+            <Menu.Item className="text-red-500" onClick={() => handleItemClick("logout")}>
+                <LogOutIcon /> 退出登录
+            </Menu.Item>
+        </Menu>
+    )
+
     return (
         <div className={"my-2 flex items-center py-2 max-xl:justify-center max-sm:justify-start max-sm:px-6 max-sm:ml-0.5"}>
-            <DropdownMenu open={show} onOpenChange={(v) => !v && setShow(false)}>
-                <DropdownMenuTrigger asChild>
-                    <Button onClick={handleLogin} variant="ghost" size="icon">
-                        <Avatar className="border">
-                            <AvatarImage src={user?.image || "/img/default-avatar.jpg"} alt={user?.name || ""} />
-                            <AvatarFallback></AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="start" className="w-56 z-[1201]">
-                    {Auth.isAdmin() && (
-                        <>
-                            <DropdownMenuItem
-                                onClick={() => {
-                                    router.push("/settings")
-                                    setShow(false)
-                                }}
-                            >
-                                <SettingsIcon />
-                                网站设置
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                        </>
-                    )}
-                    <DropdownMenuItem
-                        onClick={() => handleItemClick("logout")}
-                        className="text-red-500 focus:text-red-500"
-                    >
-                        <LogOutIcon />
-                        退出登录
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <Dropdown
+                droplist={droplist}
+                trigger="click"
+                position="br"
+                popupVisible={show}
+                onPopupVisibleChange={setShow}
+            >
+                <Button onClick={handleLogin} type="text" shape="circle">
+                    <Avatar size={32} style={{border: "1px solid"}} src={user?.image || "/img/default-avatar.jpg"}>
+                        {user?.name?.[0]}
+                    </Avatar>
+                </Button>
+            </Dropdown>
             <Link className="max-xl:hidden" href="/">
                 <div className={"ml-3 text-lg font-bold"}>{user?.name || "欢迎光临"}</div>
             </Link>
