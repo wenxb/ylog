@@ -1,7 +1,7 @@
 "use client"
 import {useRouter} from "next/navigation"
 import {PlayArrowFill} from "@/components/common/icons"
-import {Button} from "@/components/ui/button"
+import {Button} from "@arco-design/web-react"
 import axios from "axios"
 import {playAllSongs} from "@/lib/musicPlayer"
 
@@ -39,8 +39,8 @@ export const PlayListItem = ({onClick, cover, title, desc, id}) => {
                     <Button
                         onClick={handlePlayPlaylist}
                         className={"opacity-0 group-hover:opacity-100 hover:bg-blue-500/10"}
-                        size="icon"
-                        variant="ghost"
+                        shape="circle"
+                        type="text"
                     >
                         <PlayArrowFill className={"text-2xl text-blue-500"} />
                     </Button>
