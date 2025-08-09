@@ -1,8 +1,7 @@
 "use client"
 import {useSession} from "next-auth/react"
-import {Avatar, AvatarImage} from "@/components/ui/avatar"
 import {useAppStore} from "@/stores/app"
-import {Button} from "@/components/ui/button"
+import {Avatar, Button} from "@arco-design/web-react"
 
 const HeaderBar = () => {
     const {data: session} = useSession()
@@ -10,10 +9,8 @@ const HeaderBar = () => {
 
     return (
         <div className="-ml-1.5 sm:hidden">
-            <Button size="icon" variant="ghost" onClick={() => app.setShowMobileSide(true)}>
-                <Avatar className="border size-8">
-                    <AvatarImage src={session?.user?.image || "/img/default-avatar.jpg"}></AvatarImage>
-                </Avatar>
+            <Button shape="circle" type="text" onClick={() => app.setShowMobileSide(true)}>
+                <Avatar size={32} style={{border: "1px solid"}} src={session?.user?.image || "/img/default-avatar.jpg"} />
             </Button>
         </div>
     )

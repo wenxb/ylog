@@ -1,12 +1,5 @@
 "use client"
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination"
+import {Pagination} from "@arco-design/web-react"
 import {usePathname, useRouter} from "next/navigation"
 
 const YPagination = ({page, pageSize, count}) => {
@@ -23,42 +16,13 @@ const YPagination = ({page, pageSize, count}) => {
         router.push(url)
     }
 
-    const generatePageLinks = () => {
-        const pages = []
-        if (totalPages <= 1) return pages
-
-        for (let i = 1; i <= totalPages; i++) {
-            pages.push(
-                <PaginationItem key={i}>
-                    <PaginationLink
-                        isActive={page === i}
-                        onClick={() => handleClick(i)}
-                        className={page === i ? "active-class" : ""}
-                    >
-                        {i}
-                    </PaginationLink>
-                </PaginationItem>
-            )
-        }
-        return pages
-    }
-
     return (
-        <Pagination>
-            <PaginationContent>
-                {page > 1 && (
-                    <PaginationItem>
-                        <PaginationPrevious onClick={() => handleClick(Math.max(page - 1, 1))} />
-                    </PaginationItem>
-                )}
-                {generatePageLinks()}
-                {page < totalPages && (
-                    <PaginationItem>
-                        <PaginationNext onClick={() => handleClick(Math.min(page + 1, totalPages))} />
-                    </PaginationItem>
-                )}
-            </PaginationContent>
-        </Pagination>
+        <Pagination
+            current={page}
+            pageSize={pageSize}
+            total={count}
+            onChange={handleClick}
+        />
     )
 }
 
